@@ -23,7 +23,7 @@ class CellSWCRxDCaSpine(CellSWC, CellRxDCa):
             how many segments have each section by default.
             With each um of L this number will be increased by seg_per_L_um
         @param seg_per_L_um:
-            how many segments per single um of L, Length.  Can be < 1
+            how many segments per single um of L, Length.  Can be < 1. None is 0.
         @param add_const_segs:
             how many segments have each section by default.
             With each um of L this number will be increased by seg_per_L_um
@@ -48,7 +48,7 @@ class CellSWCRxDCaSpine(CellSWC, CellRxDCa):
             self.heads.append(head)
             self.necks.append(neck)
             self.connect(fr='head_%s' % i, to='neck_%s' % i)
-            #self._con_random_neck_to_neurite(neck, max_l, added)
+            self._con_random_neck_to_neurite(neck, max_l, added)
 
         CellRxDCa.__init__(self, name=name, mechanism=mechanism, is_3d=is_3d, threads=threads, dx_3d_size=dx_3d_size)
 

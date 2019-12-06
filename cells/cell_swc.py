@@ -15,7 +15,7 @@ class CellSWC(Cell):
         @param mechanism:
             Single MOD mechanism or a list of MOD mechanisms
         @param seg_per_L_um:
-            how many segments per single um of L, Length.  Can be < 1
+            how many segments per single um of L, Length.  Can be < 1. None is 0.
         @param add_const_segs:
             how many segments have each section by default.
             With each um of L this number will be increased by seg_per_L_um
@@ -33,6 +33,7 @@ class CellSWC(Cell):
             name = sec.name().split('.')[-1]  # eg. name="dend[19]"
             self.secs[name] = sec
 
+        add = int(sec.L*seg_per_L_um) if seg_per_L_um is not None else 0
         for sec in self.secs.values():
-            sec.nseg = add_const_segs + int(sec.L*seg_per_L_um)
+            sec.nseg = add_const_segs + add
 

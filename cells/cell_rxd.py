@@ -6,7 +6,7 @@ from cells.cell import Cell
 
 
 class CellRxD(Cell):
-    def __init__(self, name, mechanism=None, is_3d=False, threads=1, dx_3d_size=0.1):
+    def __init__(self, name, mechanism=None, is_3d=False, threads=1, dx_3d_size=None):
         """
         @param name:
             Name of the cell
@@ -17,7 +17,7 @@ class CellRxD(Cell):
         @param threads:
             How many threads to use for RxD. Default 1
         @param dx_3d_size:
-            If 3D geometry is True, define the size of the single compartment size.
+            If 3D geometry is True, define the size of the single compartment size. Default None.
         """
         Cell.__init__(self, name, mechanism)
 

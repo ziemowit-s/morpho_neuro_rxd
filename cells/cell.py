@@ -9,12 +9,14 @@ class Cell:
         @param mechanism:
             Single MOD mechanism or a list of MOD mechanisms
         """
-        self._name = name
-        self.secs = {}
-        if isinstance(mechanism, list):
-            self.mechanisms = mechanism
-        else:
-            self.mechanisms = []
+        if not hasattr(self, '_core_cell_builded'):
+            self._name = name
+            self.secs = {}
+            if isinstance(mechanism, list):
+                self.mechanisms = mechanism
+            else:
+                self.mechanisms = []
+            self._core_cell_builded = True
 
     def add_cylindric_sec(self, name, diam=None, l=None, nseg=1):
         sec = h.Section(name=name, cell=self)
