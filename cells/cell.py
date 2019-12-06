@@ -25,6 +25,7 @@ class Cell:
         for m in self.mechanisms:
             sec.insert(m)
         self.secs[name] = sec
+        return sec
 
     def connect(self, fr, to, to_loc=1.0, fr_loc=0.0):
         """default: fr(0.0) -> to(1.0)"""

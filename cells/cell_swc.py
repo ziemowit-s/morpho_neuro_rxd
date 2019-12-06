@@ -33,6 +33,6 @@ class CellSWC(Cell):
             name = sec.name().split('.')[-1]  # eg. name="dend[19]"
             self.secs[name] = sec
 
-        for sec in self.segs:
+        for sec in self.secs.values():
             sec.nseg = add_const_segs + int(sec.L*seg_per_L_um)
 

@@ -1,4 +1,4 @@
-from neuron import rxd
+from neuron import h, rxd
 
 from cells.cell_rxd import CellRxD
 
