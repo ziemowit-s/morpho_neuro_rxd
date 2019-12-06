@@ -21,9 +21,9 @@ if __name__ == '__main__':
     h.cvode.active(1)
 
     cell = CellRxDCa(name="cell")
-    cell.add_sec(name="head", diam=1, l=1, nseg=50)
-    cell.add_sec(name="neck", diam=0.5, l=0.5, nseg=50)
-    cell.add_sec(name="dend", diam=0.5, l=5, nseg=100)
+    cell.add_cylindric_sec(name="head", diam=1, l=1, nseg=50)
+    cell.add_cylindric_sec(name="neck", diam=0.5, l=0.5, nseg=50)
+    cell.add_cylindric_sec(name="dend", diam=0.5, l=5, nseg=100)
     cell.connect(fr='head', to='neck')
     cell.connect(fr='neck', to='dend', to_loc=0.5)
     cell.add_rxd()

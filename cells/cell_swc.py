@@ -6,7 +6,20 @@ h.load_file('import3d.hoc')
 
 
 class CellSWC(Cell):
-    def __init__(self, name, swc_file, mechanism=None):
+    def __init__(self, name, swc_file, mechanism=None, seg_per_L_um=1.0, add_const_segs=11):
+        """
+        @param name:
+            Name of the cell
+        @param swc_file:
+            swc file path
+        @param mechanism:
+            Single MOD mechanism or a list of MOD mechanisms
+        @param seg_per_L_um:
+            how many segments per single um of L, Length.  Can be < 1
+        @param add_const_segs:
+            how many segments have each section by default.
+            With each um of L this number will be increased by seg_per_L_um
+        """
         Cell.__init__(self, name, mechanism)
         if swc_file is None:
             raise FileNotFoundError("swc file need to be specified, found NONE.")
@@ -16,8 +29,10 @@ class CellSWC(Cell):
         i3d = h.Import3d_GUI(morpho, 0)
         i3d.instantiate(self)
 
-        self.segs = self.all
-        for sec in self.segs:
-            sec.nseg = 1 + 10 + int(sec.L/5)
+        for sec in self.all:
+            name = sec.name().split('.')[-1]  # eg. name="dend[19]"
+            self.secs[name] = sec
 
+        for sec in self.segs:
+            sec.nseg = add_const_segs + int(sec.L*seg_per_L_um)
 

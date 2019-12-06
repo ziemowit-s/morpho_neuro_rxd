@@ -4,7 +4,10 @@ from neuron import h
 class Cell:
     def __init__(self, name, mechanism=None):
         """
-        spine_head->spine_neck->dendrite
+        @param name:
+            Name of the cell
+        @param mechanism:
+            Single MOD mechanism or a list of MOD mechanisms
         """
         self._name = name
         self.secs = {}
@@ -13,7 +16,7 @@ class Cell:
         else:
             self.mechanisms = []
 
-    def add_sec(self, name, diam=None, l=None, nseg=1):
+    def add_cylindric_sec(self, name, diam=None, l=None, nseg=1):
         sec = h.Section(name=name, cell=self)
         sec.L = l
         sec.diam = diam

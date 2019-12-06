@@ -4,13 +4,14 @@ from neuron.units import mV
 
 from cells.cell_swc_rxd_ca_spine import CellSWCRxDCaSpine
 
+THREADS = 8
+
 if __name__ == '__main__':
     h.load_file('stdrun.hoc')
     h.cvode.atol(1e-8)
     h.cvode.active(1)
-    rxd.nthread(8)
 
-    cell = CellSWCRxDCaSpine(name='cell', spine_number=10, swc_file='cells/morphology/c91662.swc')
+    cell = CellSWCRxDCaSpine(name='cell', spine_number=10, threads=THREADS, swc_file='cells/morphology/c91662.swc')
 
     # init
     h.finitialize(-65 * mV)
