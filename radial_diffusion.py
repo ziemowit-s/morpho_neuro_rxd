@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     # run
     sleep = 3
-    print("sleep before run for: %s seconds", sleep)
+    print("sleep before run for: %s seconds" % sleep)
     time.sleep(sleep)
     before = time.time()
     const_delay = DELAY / 1000  # in seconds

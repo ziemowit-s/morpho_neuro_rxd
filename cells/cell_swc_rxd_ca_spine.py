@@ -1,5 +1,3 @@
-from neuron import h, rxd
-
 from cells.cell_rxd_ca import CellRxDCa
 from cells.cell_swc import CellSWC
 
