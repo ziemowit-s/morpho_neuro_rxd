@@ -61,6 +61,8 @@ if __name__ == '__main__':
         time.sleep(delay)
         before = time.time()
         ps.fastflush()
+
+        # print
         neck_cai2 = get_mol(cell.secs['neck'], 0.2)
         neck_cai1 = get_mol(cell.secs['neck'], 0.1)
 

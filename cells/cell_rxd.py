@@ -32,16 +32,18 @@ class CellRxD(Cell):
             raise MemoryError("RxD has been called earlier, after which you can't change morphology")
         return super().add_cylindric_sec(name, diam, l, nseg)
 
-    def add_rxd(self):
+    def add_rxd(self, secs=None):
         if hasattr(self, '_is_rxd_set') and self._is_rxd_set:
             raise MemoryError("RxD has been called earlier, it can be called only once, after all morphology is set")
         self._is_rxd_set = True
+        if secs is None:
+            secs = self.secs.values()
 
         if self.is_3d:
-            rxd.set_solve_type(self.secs.values(), dimension=3)
+            rxd.set_solve_type(secs, dimension=3)
         rxd.nthread(self.threads)
 
-        self._add_rxd(self.secs, dx_3d_size=self._dx_3d_size)
+        self._add_rxd(secs, dx_3d_size=self._dx_3d_size)
 
     @abc.abstractmethod
     def _add_rxd(self, regs, dx_3d_size):
