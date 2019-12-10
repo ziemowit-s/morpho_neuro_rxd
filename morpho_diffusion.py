@@ -3,11 +3,12 @@ import time
 import numpy as np
 from neuron import h, gui
 from neuron.units import mV, ms
+import matplotlib.pyplot as plt
 
 from cells.cell_swc_rxd_ca_spine import CellSWCRxDCaSpine
 from utils import plot_cai
 
-RUNTIME = 50 * ms
+RUNTIME = 0  #50 * ms
 STEPSIZE = 0.01 * ms
 DELAY = 20 * ms  # between steps
 THREADS = 32
@@ -22,8 +23,8 @@ if __name__ == '__main__':
     h.cvode.active(1)
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
-    cell = CellSWCRxDCaSpine(name='cell', spine_number=50, threads=THREADS, seg_per_L_um=1,
-                             swc_file='cells/morphology/4-14-2016-sl2-c3-basal-dendrite.CNG.swc')
+    cell = CellSWCRxDCaSpine(name='cell', spine_number=0, threads=THREADS, seg_per_L_um=1,
+                             swc_file='cells/morphology/my_test.swc')
     cell.add_rxd()
 
     # init
@@ -35,6 +36,7 @@ if __name__ == '__main__':
 
     # plots
     ps = plot_cai()
+    h.PlotShape(False).plot(plt)
 
     print("sleep before run for: %s seconds" % INIT_SLEEP)
     time.sleep(INIT_SLEEP)
