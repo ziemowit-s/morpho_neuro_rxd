@@ -26,13 +26,10 @@ class CellHOC(Cell):
                 try:
                     f = getattr(h, d)
                     if isinstance(f, Section):
-                        sec = f
+                        self.secs[name] = f
                     elif len(f) > 0 and isinstance(f[0], Section):
-                        sec = f[0]
-                    else:
-                        continue
-                    name = sec.name().split('[')[0]
-                    self.secs[name] = f
+                        for ff in f:
+                            self.secs[ff.name()] = ff
                 except TypeError:
                     continue
 

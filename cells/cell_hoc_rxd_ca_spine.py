@@ -1,10 +1,11 @@
+from cells.cell_hoc import CellHOC
 from cells.cell_rxd_ca import CellRxDCa
 from cells.cell_spine import CellSpine
 from cells.cell_swc import CellSWC
 
 
-class CellSWCRxDCaSpine(CellSWC, CellSpine, CellRxDCa):
-    def __init__(self, name, swc_file, spine_number, spine_nseg=2, mechanism=None, seg_per_L_um=1.0, add_const_segs=11,
+class CellHOCRxDCaSpine(CellHOC, CellSpine, CellRxDCa):
+    def __init__(self, name, spine_number, spine_nseg=2, hoc_files=None, mechanism=None, seg_per_L_um=1.0, add_const_segs=11,
                  is_3d=False, threads=1, dx_3d_size=0.1):
         """
         @param name:
@@ -15,6 +16,8 @@ class CellSWCRxDCaSpine(CellSWC, CellSpine, CellRxDCa):
             The number of spines to create
         @param spine_nseg:
             number of segments in the whole spine (1/2 will go to the head and 1/2 to the neck)
+        @param hoc_files:
+            list of string paths to hoc files or single string of single hoc file
         @param mechanism:
             Single MOD mechanism or a list of MOD mechanisms
         @param seg_per_L_um:
@@ -35,8 +38,7 @@ class CellSWCRxDCaSpine(CellSWC, CellSpine, CellRxDCa):
             If 3D geometry is True, define the size of the single compartment size.
 
         """
-        CellSWC.__init__(self, name=name, swc_file=swc_file, mechanism=mechanism,
-                         seg_per_L_um=seg_per_L_um, add_const_segs=add_const_segs)
+        CellHOC.__init__(self, name=name, hoc_files=hoc_files, mechanism=mechanism)
 
         CellSpine.__init__(self, name=name, spine_number=spine_number, mechanism=mechanism, spine_nseg=spine_nseg)
 
