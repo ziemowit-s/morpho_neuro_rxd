@@ -21,12 +21,18 @@ class CellHOC(Cell):
             for f in hoc_files:
                 h.load_file(f)
 
+            # add each Section or Section list from h object to self.secs dictionary
             for d in dir(h):
                 try:
                     f = getattr(h, d)
-                    if len(f) > 0 and isinstance(f[0], Section):
-                        name = f[0].name().split('[')[0]
-                        self.secs[name] = f
+                    if isinstance(f, Section):
+                        sec = f
+                    elif len(f) > 0 and isinstance(f[0], Section):
+                        sec = f[0]
+                    else:
+                        continue
+                    name = sec.name().split('[')[0]
+                    self.secs[name] = f
                 except TypeError:
                     continue
 
