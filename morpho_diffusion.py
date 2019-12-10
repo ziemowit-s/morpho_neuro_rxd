@@ -1,39 +1,19 @@
 import time
 
 import numpy as np
-from neuron import h, gui, rxd
-import matplotlib.pyplot as plt
-from neuron.rxd.node import Node3D
+from neuron import h, gui
 from neuron.units import mV, ms
 
 from cells.cell_swc_rxd_ca_spine import CellSWCRxDCaSpine
+from utils import plot_cai
 
 RUNTIME = 50 * ms
 STEPSIZE = 0.01 * ms
 DELAY = 20 * ms  # between steps
 THREADS = 32
+INIT_SLEEP = 3  # seconds
 
-
-def plot_contours(species: rxd.Species):
-    r = species.nodes[0].region
-    if not hasattr(r, '_xs'):
-        raise LookupError("For RxD ionic contour plot - you must use 3D RxD model.")
-    xz = np.empty((max(r._xs)+1, max(r._zs)+1))
-    xz.fill(np.nan)
-
-    def replace_nans(a, b):
-        if np.isnan(a):
-            return b
-        return max(a, b)
-
-    for node in species.nodes:
-        if isinstance(node, Node3D):
-            xz[node._i, node._k] = replace_nans(xz[node._i, node._k], node.value)
-
-    xs, ys = np.meshgrid(range(xz.shape[1]), range(xz.shape[0]))
-    plt.contour(xs, ys, np.nan_to_num(xz), 0.5, colors='k', linewidths=0.5)
-    plt.axis('equal')
-    plt.axis('off')
+max_delay = DELAY / 1000  # in seconds
 
 
 if __name__ == '__main__':
@@ -49,34 +29,32 @@ if __name__ == '__main__':
     # init
     h.finitialize(-65 * mV)
     for n in cell.ca.nodes:
-        if 'Cell[cell].head' in str(n.segment) and n.segment.x >.9:
+        if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
             n.concentration = 0.1
     h.cvode.re_init()
 
-    # plot shape
-    ps = h.PlotShape(True)
-    ps.variable('cai')
-    ps.scale(0, 0.01)
-    ps.show(0)
-    h.fast_flush_list.append(ps)
-    ps.exec_menu('Shape Plot')
+    # plots
+    ps = plot_cai()
 
-    #play
-    sleep = 10
-    print("sleep before run for: %s seconds" % sleep)
-    time.sleep(sleep)
-    before = time.time()
-    const_delay = DELAY / 1000  # in seconds
+    print("sleep before run for: %s seconds" % INIT_SLEEP)
+    time.sleep(INIT_SLEEP)
+
+    # run main loop
+    before = time.time()  # compute time before
     for i in np.arange(0, RUNTIME, STEPSIZE):
+
+        # step till i-th ms
         h.continuerun(i * ms)
         current = time.time()
-        comp_time_ms = current - before
+        computation_time = current - before
 
-        delay = const_delay - comp_time_ms
+        # adjust delay
+        delay = max_delay - computation_time
         if delay < 0:
             delay = 0
-
         time.sleep(delay)
-        before = time.time()
+        before = time.time()  # compute time before
+
+        # flush shape and console log
         ps.fastflush()
-        print(round(i, 2), "ms", '// comp_time_ms:', round(comp_time_ms * 1000, 0))
+        print(round(i, 2), "ms", '// comp_time_ms:', round(computation_time * 1000, 0))

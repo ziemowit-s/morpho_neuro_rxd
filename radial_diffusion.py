@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import time
 
 from cells.cell_rxd_ca import CellRxDCa
+from utils import plot_cai
 
 RUNTIME = 5 * ms
 STEPSIZE = 0.01 * ms
@@ -34,14 +35,7 @@ if __name__ == '__main__':
     cell.ca.nodes[head_last].concentration = 0.5
     h.cvode.re_init()
 
-    # plot shape
-    ps = h.PlotShape(True)
-    ps.variable('cai')
-    ps.scale(0, 0.01)
-    ps.show(0)
-    h.fast_flush_list.append(ps)
-    ps.exec_menu('Shape Plot')
-    h.PlotShape(False).plot(plt)
+    ps = plot_cai()
 
     # run
     sleep = 3
