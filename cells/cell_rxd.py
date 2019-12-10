@@ -32,7 +32,7 @@ class CellRxD(Cell):
             raise MemoryError("RxD has been called earlier, after which you can't change morphology")
         return super().add_cylindric_sec(name, diam, l, nseg)
 
-    def add_rxd(self, secs=None):
+    def add_rxd(self, secs=None, rxd_func=None):
         if hasattr(self, '_is_rxd_set') and self._is_rxd_set:
             raise MemoryError("RxD has been called earlier, it can be called only once, after all morphology is set")
         self._is_rxd_set = True

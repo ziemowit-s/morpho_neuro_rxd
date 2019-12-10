@@ -33,7 +33,7 @@ class CellSWC(Cell):
             name = sec.name().split('.')[-1]  # eg. name="dend[19]"
             self.secs[name] = sec
 
-        add = int(sec.L*seg_per_L_um) if seg_per_L_um is not None else 0
         for sec in self.secs.values():
+            add = int(sec.L*seg_per_L_um) if seg_per_L_um is not None else 0
             sec.nseg = add_const_segs + add
 
