@@ -24,7 +24,7 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     cell = CellSWCRxDCaSpine(name='cell', spine_number=0, threads=THREADS, seg_per_L_um=1,
-                             swc_file='cells/morphology/my_test.swc')
+                             swc_file='cells/morphology/swc/c91662.swc')
     cell.add_rxd()
 
     # init
