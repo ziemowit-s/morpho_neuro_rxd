@@ -1,14 +1,13 @@
 import time
 
 import numpy as np
-from neuron import h, gui, rxd
+from neuron import h, rxd
 from neuron.units import mV, ms
-import matplotlib.pyplot as plt
 
-from cells.cell_hoc_rxd_ca_spine import CellHOCRxDCaSpine
-from cells.cell_rxd_ca import CellRxDCa
-from cells.cell_rxd_spine import CellRxDSpine
-from cells.cell_swc_rxd_ca_spine import CellSWCRxDCaSpine
+from cells.cell_rxd import CellRxD
+from cells.cell_spine import CellSpine
+from cells.cell_swc import CellSWC
+from cells.depricated.cell_rxd_spine import CellRxDSpine
 from utils import plot_cai
 
 RUNTIME = 5000 * ms
@@ -20,8 +19,9 @@ INIT_SLEEP = 6  # seconds
 max_delay = DELAY / 1000  # in seconds
 
 
-class CellRxDSpineCa(CellRxDSpine):
-    def _add_rxd(self, secs, dx_3d_size):
+class CellSWCRxDCaSpine(CellSWC, CellRxD, CellSpine):
+
+    def _add_rxd(self, sections, dx_3d_size):
         """
         Must be called after all secs are set.
         @param secs:
@@ -29,7 +29,7 @@ class CellRxDSpineCa(CellRxDSpine):
             If 3D geometry is True, define the size of the single compartment size.
         """
 
-        reg = self.regs = rxd.Region(secs=secs, nrn_region='i', dx=dx_3d_size)
+        reg = self.regs = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
         self.ca = rxd.Species(regions=reg, initial=50e-6, name='ca', charge=2, d=0.6)
         self.cabuf = rxd.Species(regions=reg, initial=0.003, name='cabuf', charge=0)
 
@@ -43,17 +43,9 @@ if __name__ == '__main__':
     h.cvode.active(1)
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
-    cell = CellRxDSpineCa(name="cell", spine_number=10, spine_nseg=20, threads=8, spine_not_in_by_name=['soma', 'axon'])
-
-    cell.add_cylindric_sec(name="dend", diam=1, l=50, nseg=100)
-    #cell.add_cylindric_sec(name="soma", diam=10, l=10, nseg=100)
-    #cell.connect(fr='soma', to='dend')
+    cell = CellSWCRxDCaSpine(name="cell")
+    cell.add_swc()
     cell.add_spines()
-
-    #cell = CellSWCRxDCaSpine(name='cell', spine_number=10, spine_nseg=20, threads=THREADS, seg_per_L_um=1,
-    #                         swc_file='cells/morphology/swc/my.swc', spine_not_in_by_name=['soma', 'axon'])
-    #cell = CellHOCRxDCaSpine(name='cell', hoc_files="cells/morphology/hoc/Mig_geo5038804.hoc",
-    #                         spine_number=200, spine_nseg=40, threads=THREADS, seg_per_L_um=1)
     cell.add_rxd()
 
     # init

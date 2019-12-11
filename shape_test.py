@@ -1,6 +1,6 @@
-from neuron import h, gui
+from neuron import h
 
-from cells.cell_hoc_rxd_ca_spine import CellHOCRxDCaSpine
+from cells.depricated.cell_hoc_rxd_ca_spine import CellHOCRxDCaSpine
 
 h.load_file('import3d.hoc')
 
