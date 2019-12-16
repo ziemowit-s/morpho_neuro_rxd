@@ -18,20 +18,22 @@ class CellSpine(Cell):
         @param spine_number:
             The number of spines to create
         @param sections:
-            list of sections or string defining section name
+            list of sections or string defining single section name or sections names separated by space
+            param 'all' - takes all sections
         @param head_nseg
         @param neck_nseg
         """
-        if isinstance(sections, str):
-            sections = [sections]
-        sections = self.filter_secs(sections)
+        if sections == 'all':
+            sections = self.secs.values()
+        else:
+            sections = self.filter_secs(sections)
 
         for i in range(spine_number):
-            head = self.add_cylindric_sec(name="head_%s" % i, diam=1, l=1, nseg=head_nseg)
-            neck = self.add_cylindric_sec(name="neck_%s" % i, diam=0.5, l=0.5, nseg=neck_nseg)
+            head = self.add_cylindric_sec(name="head[%s]" % i, diam=1, l=1, nseg=head_nseg)
+            neck = self.add_cylindric_sec(name="neck[%s]" % i, diam=0.5, l=0.5, nseg=neck_nseg)
             self.heads.append(head)
             self.necks.append(neck)
-            self.connect(fr='head_%s' % i, to='neck_%s' % i)
+            self.connect(fr='head[%s]' % i, to='neck[%s]' % i)
             self._connect_necks_rand_uniform(neck, sections)
 
     def _connect_necks_rand_uniform(self, necks, sections):

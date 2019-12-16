@@ -4,9 +4,9 @@ import numpy as np
 from neuron import h, gui
 from neuron.units import mV, ms
 
+from cells.cell_hoc import CellHOC
 from cells.cell_rxd import CellRxD
 from cells.cell_spine import CellSpine
-from cells.cell_swc import CellSWC
 from cells.rxd_tools import RxDCa
 from utils import plot_cai
 
@@ -19,10 +19,10 @@ INIT_SLEEP = 6  # seconds
 max_delay = DELAY / 1000  # in seconds
 
 
-class CellSWCRxDCaSpine(CellSWC, CellRxD, CellSpine):
+class CellHOCRxDCaSpine(CellHOC, CellSpine, CellRxD):
     def __init__(self, name):
-        CellSWC.__init__(self, name)
-        CellRxD.__init__(self, name)
+        CellHOC.__init__(self, name)
+        #CellRxD.__init__(self, name)
         CellSpine.__init__(self, name)
 
 
@@ -32,10 +32,10 @@ if __name__ == '__main__':
     h.cvode.active(1)
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
-    cell = CellSWCRxDCaSpine(name="cell")
-    cell.add_swc(swc_file='cells/morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
-    cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
-    cell.add_rxd(rxd_obj=RxDCa())
+    cell = CellHOCRxDCaSpine(name="cell")
+    cell.add_hoc(hoc_file='cells/morphology/hoc/Mig_geo5038804.hoc', seg_per_L_um=1, add_const_segs=11)
+    cell.add_spines(spine_number=500, head_nseg=10, neck_nseg=10, sections='basal apical trunk')
+    cell.add_rxd(rxd_obj=RxDCa(), sections="basal apical trunk head neck")
 
     # init
     h.finitialize(-65 * mV)
