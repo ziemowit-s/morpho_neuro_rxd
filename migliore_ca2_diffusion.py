@@ -34,8 +34,8 @@ if __name__ == '__main__':
 
     cell = CellHOCRxDCaSpine(name="cell")
     cell.add_hoc(hoc_file='cells/morphology/hoc/Mig_geo5038804.hoc', seg_per_L_um=1, add_const_segs=11)
-    cell.add_spines(spine_number=500, head_nseg=10, neck_nseg=10, sections='basal apical trunk')
-    cell.add_rxd(rxd_obj=RxDCa(), sections="basal apical trunk head neck")
+    cell.add_spines(spine_number=500, head_nseg=10, neck_nseg=10, sections='apical trunk')
+    cell.add_rxd(rxd_obj=RxDCa(), sections="apical trunk head neck")
 
     # init
     h.finitialize(-65 * mV)

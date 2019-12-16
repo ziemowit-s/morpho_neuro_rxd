@@ -35,7 +35,7 @@ if __name__ == '__main__':
     cell = CellSWCRxDCaSpine(name="cell")
     cell.add_swc(swc_file='cells/morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
-    cell.add_rxd(rxd_obj=RxDCa())
+    cell.add_rxd(rxd_obj=RxDCa(), sections="dend head neck")
 
     # init
     h.finitialize(-65 * mV)
