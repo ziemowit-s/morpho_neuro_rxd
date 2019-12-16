@@ -1,4 +1,6 @@
-from neuron import h, rxd
+from os import path
+
+from neuron import h, gui
 
 from cells.cell import Cell
 
@@ -17,6 +19,8 @@ class CellSWC(Cell):
             With each um of L this number will be increased by seg_per_L_um
         """
         # SWC importing
+        if not path.exists(swc_file):
+            raise FileNotFoundError()
         morpho = h.Import3d_SWC_read()
         morpho.input(swc_file)
         h.Import3d_GUI(morpho, 0)

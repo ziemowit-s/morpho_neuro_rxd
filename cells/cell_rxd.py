@@ -6,15 +6,12 @@ from cells.cell import Cell
 
 
 class CellRxD(Cell):
-    def __init__(self, name, mechanism=None):
+    def __init__(self, name):
         """
         @param name:
             Name of the cell
-        @param mechanism:
-            Single MOD mechanism or a list of MOD mechanisms
         """
-        Cell.__init__(self, name, mechanism)
-
+        Cell.__init__(self, name)
         self.regs = {}
         self._is_rxd_set = False
 
@@ -39,7 +36,7 @@ class CellRxD(Cell):
         if sections is None:
             sections = self.secs.values()
         else:
-            sections = self.filter_sections(sections)
+            sections = self.filter_secs(left=sections)
 
         if is_3d:
             rxd.set_solve_type(sections, dimension=3)

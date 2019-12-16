@@ -4,18 +4,12 @@ from cells.cell import Cell
 
 
 class CellSpine(Cell):
-    def __init__(self, name, mechanism=None):
-        """
-        @param name:
-            Name of the cell
-        @param mechanism:
-            Single MOD mechanism or a list of MOD mechanisms
-        """
-        Cell.__init__(self, name, mechanism)
+    def __init__(self, name):
+        Cell.__init__(self, name)
         self.heads = []
         self.necks = []
 
-    def add_spines(self, spine_number, head_nseg=2, neck_nseg=2, sections=None):
+    def add_spines(self, spine_number, sections, head_nseg=2, neck_nseg=2):
         """
         Single spine is 2 x cylinder:
           * head: L=1um diam=1um
@@ -23,14 +17,14 @@ class CellSpine(Cell):
 
         @param spine_number:
             The number of spines to create
-        @param head_nseg
-        @param neck_nseg
         @param sections:
             list of sections or string defining section name
+        @param head_nseg
+        @param neck_nseg
         """
         if isinstance(sections, str):
             sections = [sections]
-        sections = self.filter_sections(sections)
+        sections = self.filter_secs(sections)
 
         for i in range(spine_number):
             head = self.add_cylindric_sec(name="head_%s" % i, diam=1, l=1, nseg=head_nseg)
@@ -38,20 +32,25 @@ class CellSpine(Cell):
             self.heads.append(head)
             self.necks.append(neck)
             self.connect(fr='head_%s' % i, to='neck_%s' % i)
-            self._con_random_neck_to_neurite(neck, sections)
+            self._connect_necks_rand_uniform(neck, sections)
 
-    def _con_random_neck_to_neurite(self, neck, sections):
-        max_l = int(sum([v.L for k, v in sections]))
-        added = dict([(k, []) for k, v in sections])
+    def _connect_necks_rand_uniform(self, necks, sections):
+        """
+        Connect necks list to sections list with uniform random distribution
+        @param necks:
+        @param sections:
+        """
+        max_l = int(sum([s.L for s in sections]))
+        added = dict([(s.name(), []) for s in sections])
 
         l = 0
         r = randint(0, max_l)
-        for key, seg in sections:
-            l += seg.L
+        for s in sections:
+            l += s.L
             if l > r:
-                loc = (r - l + seg.L) / seg.L
-                if loc in added[key]:
+                loc = (r - l + s.L) / s.L
+                if loc in added[s.name()]:
                     break
-                neck.connect(seg(loc), 0.0)
-                added[key].append(loc)
+                necks.connect(s(loc), 0.0)
+                added[s.name()].append(loc)
                 break

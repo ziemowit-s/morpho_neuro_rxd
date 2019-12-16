@@ -1,13 +1,12 @@
 import time
 
 import numpy as np
-from neuron import h, rxd
+from neuron import h, rxd, gui
 from neuron.units import mV, ms
 
 from cells.cell_rxd import CellRxD
 from cells.cell_spine import CellSpine
 from cells.cell_swc import CellSWC
-from cells.depricated.cell_rxd_spine import CellRxDSpine
 from utils import plot_cai
 
 RUNTIME = 5000 * ms
@@ -20,6 +19,10 @@ max_delay = DELAY / 1000  # in seconds
 
 
 class CellSWCRxDCaSpine(CellSWC, CellRxD, CellSpine):
+    def __init__(self, name):
+        CellSWC.__init__(self, name)
+        CellRxD.__init__(self, name)
+        CellSpine.__init__(self, name)
 
     def _add_rxd(self, sections, dx_3d_size):
         """
@@ -44,8 +47,8 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     cell = CellSWCRxDCaSpine(name="cell")
-    cell.add_swc()
-    cell.add_spines()
+    cell.add_swc(swc_file='cells/morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
+    cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_rxd()
 
     # init

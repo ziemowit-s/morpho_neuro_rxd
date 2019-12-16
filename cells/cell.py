@@ -2,21 +2,26 @@ from neuron import h
 
 
 class Cell:
-    def __init__(self, name, mechanism=None):
+    def __init__(self, name):
         """
         @param name:
             Name of the cell
+        """
+        # if Cell (named core_cell) have been built before on the stack of super() objects
+        if not hasattr(self, '_core_cell_builded'):
+            self._name = name
+            self.mechanisms = []
+            self.secs = {}
+            self._core_cell_builded = True
+
+    def add_mechanism(self, mechanism=None):
+        """
         @param mechanism:
             Single MOD mechanism or a list of MOD mechanisms
         """
-        if not hasattr(self, '_core_cell_builded'):
-            self._name = name
-            self.secs = {}
-            if isinstance(mechanism, list):
-                self.mechanisms = mechanism
-            else:
-                self.mechanisms = []
-            self._core_cell_builded = True
+        if not isinstance(mechanism, list):
+            mechanism = [mechanism]
+        self.mechanisms.extend(mechanism)
 
     def add_cylindric_sec(self, name, diam=None, l=None, nseg=1, mechanisms='all'):
         """
@@ -50,21 +55,19 @@ class Cell:
         to = self.secs[to]
         fr.connect(to(to_loc), fr_loc)
 
-    def filter_sections(self, sections):
+    def filter_secs(self, left):
         """
-        @param sections:
-            list of sections or string defining section name
+        @param left:
+            list of sections or string defining section name. Only sections specified here will remain
         """
-        filtered_secs = []
+        result = []
         for k, v in self.secs.items():
-            is_add = True
-            for f in sections:
-                if f.lower() in k.lower():
-                    is_add = False
+            for s in left:
+                sec_name = ''.join(k.split("[")[:-1])
+                if s.lower() == sec_name.lower():
+                    result.append(v)
                     break
-            if is_add:
-                filtered_secs.append((k, v))
-        return filtered_secs
+        return result
 
     def __repr__(self):
         return "Cell[{}]".format(self._name)
