@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from neuron import h, gui
+from neuron import h
 from neuron.units import mV, ms
 
 from cells.cell_hoc import CellHOC
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     cell = CellHOCRxDCaSpine(name="cell")
-    cell.add_hoc(hoc_file='cells/morphology/hoc/Mig_geo5038804.hoc', seg_per_L_um=1, add_const_segs=11)
+    cell.add_hoc(hoc_file='morphology/hoc/Mig_geo5038804.hoc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=500, head_nseg=10, neck_nseg=10, sections='apical trunk')
     cell.add_rxd(rxd_obj=RxDCa(), sections="apical trunk head neck")
 

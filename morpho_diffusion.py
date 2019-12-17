@@ -1,7 +1,7 @@
 import time
 
 import numpy as np
-from neuron import h, gui
+from neuron import h
 from neuron.units import mV, ms
 
 from cells.cell_rxd import CellRxD
@@ -19,10 +19,10 @@ INIT_SLEEP = 6  # seconds
 max_delay = DELAY / 1000  # in seconds
 
 
-class CellSWCRxDCaSpine(CellSWC, CellRxD, CellSpine):
+class CellSWCRxDCaSpine(CellSWC, CellSpine):
     def __init__(self, name):
         CellSWC.__init__(self, name)
-        CellRxD.__init__(self, name)
+        #CellRxD.__init__(self, name)
         CellSpine.__init__(self, name)
 
 
@@ -33,15 +33,15 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     cell = CellSWCRxDCaSpine(name="cell")
-    cell.add_swc(swc_file='cells/morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
+    cell.add_swc(swc_file='morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
-    cell.add_rxd(rxd_obj=RxDCa(), sections="dend head neck")
+    #cell.add_rxd(rxd_obj=RxDCa(), sections="dend head neck")
 
     # init
     h.finitialize(-65 * mV)
-    for n in cell.rxd.ca.nodes:
-        if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
-            n.concentration = 1.0
+    #for n in cell.rxd.ca.nodes:
+    #    if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
+    #        n.concentration = 1.0
     h.cvode.re_init()
 
     # plots
