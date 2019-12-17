@@ -4,7 +4,7 @@ import numpy as np
 from neuron import h
 from neuron.units import mV, ms
 
-from cells.cell_rxd import CellRxD
+#from cells.cell_rxd import CellRxD
 from cells.cell_spine import CellSpine
 from cells.cell_swc import CellSWC
 from cells.rxd_tools import RxDCa
