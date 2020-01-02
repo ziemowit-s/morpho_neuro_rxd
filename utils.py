@@ -1,6 +1,4 @@
-import numpy as np
 from neuron import h
-import matplotlib.pyplot as plt
 
 
 def plot_cai():
