@@ -80,6 +80,29 @@ class Cell:
             raise LookupError("Cannot found sections:", left)
         return result
 
+    def set_position(self, x, y, z):
+        h.define_shape()
+        for sec in self.secs.values():
+            for i in range(sec.n3d()):
+                sec.pt3dchange(i,
+                               x - sec.x3d(i),
+                               y - sec.y3d(i),
+                               z - sec.z3d(i),
+                              sec.diam3d(i))
+        
+    def rotate_z(self, theta):
+        h.define_shape()
+        """Rotate the cell about the Z axis."""
+        for sec in self.secs.values():
+            for i in range(sec.n3d()):
+                x = sec.x3d(i)
+                y = sec.y3d(i)
+                c = h.cos(theta)
+                s = h.sin(theta)
+                xprime = x * c - y * s
+                yprime = x * s + y * c
+                sec.pt3dchange(i, xprime, yprime, sec.z3d(i), sec.diam3d(i))
+
     @staticmethod
     def _is_array_name(name):
         return "[" in name
