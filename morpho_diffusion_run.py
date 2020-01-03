@@ -13,7 +13,6 @@ from utils import plot_cai
 RUNTIME = 1000 * ms
 STEPSIZE = 0.01 * ms
 DELAY = 1 * ms  # between steps
-THREADS = 32
 INIT_SLEEP = 6  # seconds
 
 max_delay = DELAY / 1000  # in seconds
