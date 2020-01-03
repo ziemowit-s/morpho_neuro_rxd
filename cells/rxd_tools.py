@@ -31,7 +31,7 @@ class RxDCa(RxDTool):
         @param rxds:
             dictionary which contains previously added RxDTool objects
         """
-        self.reg = self.regs = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
+        self.reg = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
 
         # 1/nM = 1 × 1/10^-9M = 10^3/10^3 × 1/10^-9M = 1000/(10^3×10^-9M) = 1000/10^-6M = 1000/uM
 
