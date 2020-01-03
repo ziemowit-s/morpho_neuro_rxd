@@ -11,8 +11,7 @@ class CellRxD(Cell):
             Name of the cell
         """
         Cell.__init__(self, name)
-        self.regs = {}
-        self._is_rxd_set = False
+        self.rxds = {}
 
     def add_cylindric_sec(self, name, diam=None, l=None, nseg=1, mechanisms='all'):
         if hasattr(self, '_is_rxd_set') and self._is_rxd_set:
@@ -29,10 +28,7 @@ class CellRxD(Cell):
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """
-        if hasattr(self, '_is_rxd_set') and self._is_rxd_set:
-            raise MemoryError("RxD has been called earlier, it can be called only once, after all morphology is set")
-        self._is_rxd_set = True
-        self.rxd = rxd_obj
+        self.rxds[rxd_obj.__class__.__name__] = rxd_obj
 
         if sections is 'all':
             sections = self.secs.values()
@@ -43,6 +39,6 @@ class CellRxD(Cell):
             rxd.set_solve_type(sections, dimension=3)
         rxd.nthread(threads)
 
-        self.rxd.load(sections, dx_3d_size=dx_3d_size)
+        rxd_obj.load(sections, dx_3d_size=dx_3d_size, rxds=self.rxds)
 
 

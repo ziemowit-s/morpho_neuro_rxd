@@ -64,8 +64,6 @@ class Cell:
             left = left.split(' ')
         result = []
         for k, v in self.secs.items():
-            if 'head' in k:
-                pass
             for s in left:
                 # section names (especially created by NEURON or hoc) frequently have array-like string name
                 # eg. soma[0]. User can specify exact name eg. dend[12]
