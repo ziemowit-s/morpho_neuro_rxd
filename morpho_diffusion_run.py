@@ -73,14 +73,15 @@ if __name__ == '__main__':
 
     cell = CellSWCRxDCaSpine(name="cell")
     cell.add_swc(swc_file='morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
-    cell.add_hoc(hoc_file='mechanisms/graham2014/nmdaca.mod')
-    cell.add_hoc(hoc_file='Exp2Syn')
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
-
     cell.add_rxd(rxd_obj=RxDCa(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDncx(), sections="head neck")
 
+    for k, v in cell.secs.items():
+        v.insert('hh')
+        v.insert('pas')
+        
     # init
     h.finitialize(-65 * mV)
     for n in cell.rxds['RxDCa'].ca.nodes:

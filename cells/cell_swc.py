@@ -28,12 +28,15 @@ class CellSWC(Cell):
         i3d.instantiate(self)
 
         # add all SWC sections to self.secs; self.all is defined by SWC import
+        new_secs = {}
         for sec in self.all:
             name = sec.name().split('.')[-1]  # eg. name="dend[19]"
-            self.secs[name] = sec
+            new_secs[name] = sec
 
         # change segment number based on seg_per_L_um and add_const_segs
-        for sec in self.secs.values():
+        for sec in new_secs.values():
             add = int(sec.L*seg_per_L_um) if seg_per_L_um is not None else 0
             sec.nseg = add_const_segs + add
+
+        self.secs.update(new_secs)
 

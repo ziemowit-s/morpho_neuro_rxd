@@ -31,22 +31,22 @@ class RxDCa(RxDTool):
         @param rxds:
             dictionary which contains previously added RxDTool objects
         """
-        self.reg = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
+        self.cyt = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
 
         # 1/nM = 1 × 1/10^-9M = 10^3/10^3 × 1/10^-9M = 1000/(10^3×10^-9M) = 1000/10^-6M = 1000/uM
 
         # Ca2+
-        self.ca = rxd.Species(regions=self.reg, initial=75 * nM, name='ca', charge=2, d=174.3/sec)
+        self.ca = rxd.Species(regions=self.cyt, initial=75 * nM, name='ca', charge=2, d=174.3 / sec)
 
         # Calbindin buffer
-        self.calbindin = rxd.Species(regions=self.reg, initial=159982 * nM, name='calbindin', charge=0, d=9.3/sec)
-        self.calbindin_ca = rxd.Species(regions=self.reg, initial=18 * nM, name='calbindin_ca', charge=0, d=9.3/sec)
+        self.calbindin = rxd.Species(regions=self.cyt, initial=159982 * nM, name='calbindin', charge=0, d=9.3 / sec)
+        self.calbindin_ca = rxd.Species(regions=self.cyt, initial=18 * nM, name='calbindin_ca', charge=0, d=9.3 / sec)
         self.calbindin_ca_reaction = rxd.Reaction(self.ca + self.calbindin, self.calbindin_ca, 0.028e-3 / (nM * ms), 19.6 / (nM * ms))
 
         # Calmodulin buffer
-        self.calmodulin = rxd.Species(regions=self.reg, initial=12600 * nM, name='calmodulin', charge=0, d=4/sec)
-        self.calmodulin_ca2 = rxd.Species(regions=self.reg, initial=200 * nM, name='calmodulin_ca2', charge=0, d=4/sec)
-        self.calmodulin_ca4 = rxd.Species(regions=self.reg, initial=3 * nM, name='calmodulin_ca4', charge=0, d=4/sec)
+        self.calmodulin = rxd.Species(regions=self.cyt, initial=12600 * nM, name='calmodulin', charge=0, d=4 / sec)
+        self.calmodulin_ca2 = rxd.Species(regions=self.cyt, initial=200 * nM, name='calmodulin_ca2', charge=0, d=4 / sec)
+        self.calmodulin_ca4 = rxd.Species(regions=self.cyt, initial=3 * nM, name='calmodulin_ca4', charge=0, d=4 / sec)
         self.calmodulin_ca2_reaction = rxd.Reaction(2 * self.ca + self.calmodulin, self.calmodulin_ca2, 6e-6 / (nM * ms), 9.1e-3 / (nM * ms))
         self.calmodulin_ca4_reaction = rxd.Reaction(2 * self.ca + self.calmodulin_ca2, self.calmodulin_ca4, 0.1e-3 / (nM * ms), 1000e-3 / (nM * ms))
 
