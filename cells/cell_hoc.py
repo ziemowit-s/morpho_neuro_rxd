@@ -18,19 +18,22 @@ class CellHOC(Cell):
         h.load_file(hoc_file)
 
         # add potential new Sections from hoc file to self.secs dictionary
+        new_secs = {}
         for d in dir(h):
             try:
                 f = getattr(h, d)
                 if isinstance(f, Section):
-                    self.secs[f.name()] = f
+                    new_secs[f.name()] = f
                 elif len(f) > 0 and isinstance(f[0], Section):
                     for ff in f:
-                        self.secs[ff.name()] = ff
+                        new_secs[ff.name()] = ff
             except TypeError:
                 continue
 
         # change segment number based on seg_per_L_um and add_const_segs
-        for sec in self.secs.values():
+        for sec in new_secs.values():
             add = int(sec.L * seg_per_L_um) if seg_per_L_um is not None else 0
             sec.nseg = add_const_segs + add
+
+        self.secs.update(new_secs)
 
