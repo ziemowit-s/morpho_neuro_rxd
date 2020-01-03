@@ -9,12 +9,12 @@ from cells.cell_rxd import CellRxD
 from cells.cell_spine import CellSpine
 from cells.cell_swc import CellSWC
 from cells.rxd_tools import RxDCa, RxDpmca, RxDncx
-from utils import plot_cai
+from utils import plot_cai, plot_v
 
 RUNTIME = 1000 * ms
 STEPSIZE = 0.01 * ms
 DELAY = 1 * ms  # between steps
-INIT_SLEEP = 6  # seconds
+INIT_SLEEP = 3  # seconds
 
 max_delay = DELAY / 1000  # in seconds
 
@@ -65,6 +65,34 @@ $o2.sec connect $o3.sec(0), 1
       for i=0,$o1.count()-1 {
         $o3.sec $o1.o(i).loc(0.5)
 """
+
+
+def get_con(syn, weight, delay):
+    stim = h.NetStim()
+    con = h.NetCon(stim, syn)
+    con.delay = delay
+    con.weight[0] = weight
+    return stim, con
+
+
+def get_ampa(sec, weight, delay):
+    ampa = h.ExpSyn(sec(0.5))
+    ampa.tau = 0.5
+    ampa.e = 0
+    stim, con = get_con(ampa, weight, delay)
+    return ampa, stim, con
+
+
+def get_nmda(sec, weight, delay):
+    nmda = h.NMDAca(sec(0.5))
+    nmda.fCa = 0.1  # fraction of Ca current (Bloodgood & Sabatini)
+    nmda.tcon = 3
+    nmda.tcoff = 100
+    nmda.mgconc = 1  # (mM) standard Mg concnmda.gamma = 0.08 Larkum Science 2009 (sharpens voltage curve)
+    stim, con = get_con(nmda, weight, delay)
+    return nmda, stim, con
+
+
 if __name__ == '__main__':
     h.load_file('stdrun.hoc')
     h.cvode.atol(1e-8)
@@ -78,19 +106,28 @@ if __name__ == '__main__':
     cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDncx(), sections="head neck")
 
-    for k, v in cell.secs.items():
-        v.insert('hh')
-        v.insert('pas')
-        
+    for name, sec in cell.secs.items():
+        sec.insert('hh')
+        sec.insert('pas')
+        if 'head' in name:
+            ampa, ampa_stim, ampa_con = get_ampa(sec, weight=0.0, delay=0)
+            nmda, nmda_stim, nmda_con = get_nmda(sec, weight=0.1, delay=0)
+            ampa_stim.start = 0
+            ampa_stim.number = 1
+
+            nmda_stim.start = 0
+            nmda_stim.number = 1
+
     # init
     h.finitialize(-65 * mV)
-    for n in cell.rxds['RxDCa'].ca.nodes:
-        if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
-            n.concentration = 1.0
+    #for n in cell.rxds['RxDCa'].ca.nodes:
+    #    if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
+     #       n.concentration = 1.0
     h.cvode.re_init()
 
     # plots
-    ps = plot_cai()
+    ps_cai = plot_cai()
+    ps_v = plot_v()
 
     print("sleep before run for: %s seconds" % INIT_SLEEP)
     time.sleep(INIT_SLEEP)
@@ -112,5 +149,6 @@ if __name__ == '__main__':
         before = time.time()  # compute time before
 
         # flush shape and console log
-        ps.fastflush()
+        ps_cai.fastflush()
+        ps_v.fastflush()
         print(round(i, 2), "ms", '// comp_time_ms:', round(computation_time * 1000, 0))

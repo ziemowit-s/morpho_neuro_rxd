@@ -11,3 +11,13 @@ def plot_cai():
     ps.exec_menu('Shape Plot')
     return ps
 
+
+def plot_v():
+    # plot shape
+    ps = h.PlotShape(True)
+    ps.variable('v')
+    ps.show(0)
+    h.fast_flush_list.append(ps)
+    ps.exec_menu('Shape Plot')
+    return ps
+

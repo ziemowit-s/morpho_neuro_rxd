@@ -66,8 +66,8 @@ class RxDpmca(RxDTool):
         rxdca = rxds['RxDCa']
 
         # PMCA Pump
-        self.pmca = rxd.Species(regions=rxdca.reg, initial=760 * nM, name='pmca', charge=0, d=0)
-        self.pmca_ca = rxd.Species(regions=rxdca.reg, initial=120 * nM, name='pmca_ca', charge=0, d=0)
+        self.pmca = rxd.Species(regions=rxdca.cyt, initial=760 * nM, name='pmca', charge=0, d=0)
+        self.pmca_ca = rxd.Species(regions=rxdca.cyt, initial=120 * nM, name='pmca_ca', charge=0, d=0)
 
         self.pmca_ca_reaction = rxd.Reaction(rxdca.ca + self.pmca, self.pmca_ca, 0.05e-3 / (nM * ms), 9e-3 / (nM * ms))
         self.pmca_ca__pmca_reaction = rxd.Reaction(self.pmca_ca, self.pmca, 3.0e-3 / (nM * ms), 0)  # CaOut
@@ -87,8 +87,8 @@ class RxDncx(RxDTool):
         rxdca = rxds['RxDCa']
 
         # NCX Pump
-        self.ncx = rxd.Species(regions=rxdca.reg, initial=14980 * nM, name='ncx', charge=0, d=0)
-        self.ncx_ca = rxd.Species(regions=rxdca.reg, initial=120 * nM, name='ncx_ca', charge=0, d=0)
+        self.ncx = rxd.Species(regions=rxdca.cyt, initial=14980 * nM, name='ncx', charge=0, d=0)
+        self.ncx_ca = rxd.Species(regions=rxdca.cyt, initial=120 * nM, name='ncx_ca', charge=0, d=0)
 
         self.ncx_ca_reaction = rxd.Reaction(rxdca.ca + self.ncx, self.ncx_ca, 0.011e-3 / (nM * ms), 11.2e-3 / (nM * ms))
         self.ncx_ca_ncx_reaction = rxd.Reaction(self.ncx_ca, self.ncx, 5.6e-3 / (nM * ms), 0)  # CaOut
