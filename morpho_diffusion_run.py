@@ -7,7 +7,6 @@ from neuron.units import mV, ms
 from cells.cell_hoc import CellHOC
 from cells.cell_rxd import CellRxD
 from cells.cell_spine import CellSpine
-from cells.cell_swc import CellSWC
 from cells.rxd_tools import RxDCa, RxDpmca, RxDncx
 from utils import plot_cai, plot_v
 
@@ -19,9 +18,8 @@ INIT_SLEEP = 3  # seconds
 max_delay = DELAY / 1000  # in seconds
 
 
-class CellSWCRxDCaSpine(CellSWC, CellRxD, CellSpine, CellHOC):
+class CellSWCRxDCaSpine(CellRxD, CellSpine, CellHOC):
     def __init__(self, name):
-        CellSWC.__init__(self, name)
         CellRxD.__init__(self, name)
         CellSpine.__init__(self, name)
         CellHOC.__init__(self, name)
@@ -67,6 +65,26 @@ $o2.sec connect $o3.sec(0), 1
 """
 
 
+def make_stim(cell):
+    for name, sec in cell.secs.items():
+        sec.insert('hh')
+        sec.insert('pas')
+        if 'head' in name:
+            ampa, ampa_stim, ampa_con = get_ampa(sec, weight=0.0, delay=0)
+            nmda, nmda_stim, nmda_con = get_nmda(sec, weight=0.1, delay=0)
+            ampa_stim.start = 0
+            ampa_stim.number = 1
+
+            nmda_stim.start = 0
+            nmda_stim.number = 1
+
+
+def make_head_ca2_concentration(cell):
+    for n in cell.rxds['RxDCa'].ca.nodes:
+        if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
+            n.concentration = 1.0
+
+
 def get_con(syn, weight, delay):
     stim = h.NetStim()
     con = h.NetCon(stim, syn)
@@ -100,29 +118,18 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     cell = CellSWCRxDCaSpine(name="cell")
-    cell.add_swc(swc_file='morphology/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
+    cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_rxd(rxd_obj=RxDCa(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDncx(), sections="head neck")
 
-    for name, sec in cell.secs.items():
-        sec.insert('hh')
-        sec.insert('pas')
-        if 'head' in name:
-            ampa, ampa_stim, ampa_con = get_ampa(sec, weight=0.0, delay=0)
-            nmda, nmda_stim, nmda_con = get_nmda(sec, weight=0.1, delay=0)
-            ampa_stim.start = 0
-            ampa_stim.number = 1
-
-            nmda_stim.start = 0
-            nmda_stim.number = 1
-
     # init
     h.finitialize(-65 * mV)
-    #for n in cell.rxds['RxDCa'].ca.nodes:
-    #    if 'Cell[cell].head' in str(n.segment) and n.segment.x > .9:
-     #       n.concentration = 1.0
+
+    #make_stim(cell)
+    make_head_ca2_concentration(cell)
+
     h.cvode.re_init()
 
     # plots

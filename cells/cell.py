@@ -1,4 +1,9 @@
+from os import path
+
 from neuron import h
+
+h.load_file('stdlib.hoc')
+h.load_file('import3d.hoc')
 
 
 class Cell:
@@ -79,6 +84,48 @@ class Cell:
         if len(result) == 0:
             raise LookupError("Cannot found sections:", left)
         return result
+
+    def load_morpho(self, filepath, seg_per_L_um=1.0, add_const_segs=11):
+        """
+        @param filepath:
+            swc file path
+        @param seg_per_L_um:
+            how many segments per single um of L, Length.  Can be < 1. None is 0.
+        @param add_const_segs:
+            how many segments have each section by default.
+            With each um of L this number will be increased by seg_per_L_um
+        """
+        if not path.exists(filepath):
+            raise FileNotFoundError()
+
+        # SWC
+        fileformat = filepath.split('.')[-1]
+        if fileformat == 'swc':
+            morpho = h.Import3d_SWC_read()
+        # Neurolucida
+        elif fileformat == 'asc':
+            morpho = h.Import3d_Neurolucida3()
+        else:
+            raise Exception('file format `%s` not recognized' % filepath)
+
+        morpho.input(filepath)
+        h.Import3d_GUI(morpho, 0)
+        i3d = h.Import3d_GUI(morpho, 0)
+        i3d.instantiate(self)
+
+        # add all SWC sections to self.secs; self.all is defined by SWC import
+        new_secs = {}
+        for sec in self.all:
+            name = sec.name().split('.')[-1]  # eg. name="dend[19]"
+            new_secs[name] = sec
+
+        # change segment number based on seg_per_L_um and add_const_segs
+        for sec in new_secs.values():
+            add = int(sec.L * seg_per_L_um) if seg_per_L_um is not None else 0
+            sec.nseg = add_const_segs + add
+
+        self.secs.update(new_secs)
+        del self.all
 
     def set_position(self, x, y, z):
         h.define_shape()
