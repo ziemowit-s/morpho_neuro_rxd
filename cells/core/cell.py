@@ -56,18 +56,20 @@ class Cell:
         """default: fr(0.0) -> to(1.0)"""
         fr_loc = float(fr_loc)
         to_loc = float(to_loc)
-        fr = self.filter_secs(fr)[0]
-        to = self.filter_secs(to)[0]
+        fr = list(self.filter_secs(fr).values())[0]
+        to = list(self.filter_secs(to).values())[0]
         fr.connect(to(to_loc), fr_loc)
 
     def filter_secs(self, left):
         """
         @param left:
             list of sections or string defining single section name or sections names separated by space
+        @:return
+            dict[sec_name] = sec
         """
         if isinstance(left, str):
             left = left.split(' ')
-        result = []
+        result = {}
         for k, v in self.secs.items():
             for s in left:
                 # section names (especially created by NEURON or hoc) frequently have array-like string name
@@ -79,7 +81,7 @@ class Cell:
                 else:
                     sec_name = k
                 if s.lower() == sec_name.lower():
-                    result.append(v)
+                    result[k] = v
                     break
         if len(result) == 0:
             raise LookupError("Cannot found sections:", left)

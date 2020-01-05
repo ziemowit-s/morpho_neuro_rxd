@@ -1,6 +1,6 @@
 from random import randint
 
-from cells.cell import Cell
+from cells.core.cell import Cell
 
 
 class CellSpine(Cell):
@@ -24,9 +24,10 @@ class CellSpine(Cell):
         @param neck_nseg
         """
         if sections == 'all':
-            sections = self.secs.values()
+            sections = self.secs
         else:
             sections = self.filter_secs(sections)
+        sections = sections.values()
 
         for i in range(spine_number):
             head = self.add_cylindric_sec(name="head[%s]" % i, diam=1, l=1, nseg=head_nseg)

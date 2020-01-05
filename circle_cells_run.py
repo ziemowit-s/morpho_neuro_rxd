@@ -1,7 +1,7 @@
-from neuron import h, gui
+from neuron import h
 from matplotlib import pyplot
 
-from cells.cell import Cell
+from cells.core.cell import Cell
 
 h.load_file('stdrun.hoc')
 

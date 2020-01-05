@@ -1,7 +1,7 @@
 from neuron.rxd import rxd
 
-from cells.cell import Cell
-from cells.rxd_tools import RxDTool
+from cells.core.cell import Cell
+from cells.core.rxd_tools import RxDTool
 
 
 class CellRxD(Cell):
@@ -33,7 +33,7 @@ class CellRxD(Cell):
         if sections is 'all':
             sections = self.secs.values()
         else:
-            sections = self.filter_secs(left=sections)
+            sections = self.filter_secs(left=sections).values()
 
         if is_3d:
             rxd.set_solve_type(sections, dimension=3)

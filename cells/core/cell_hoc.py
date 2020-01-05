@@ -1,7 +1,7 @@
 from neuron import h
 from nrn import Section
 
-from cells.cell import Cell
+from cells.core.cell import Cell
 
 
 class CellHOC(Cell):

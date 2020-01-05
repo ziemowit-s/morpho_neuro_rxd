@@ -4,10 +4,10 @@ import numpy as np
 from neuron import h
 from neuron.units import mV, ms
 
-from cells.cell_hoc import CellHOC
-from cells.cell_rxd import CellRxD
-from cells.cell_spine import CellSpine
-from cells.rxd_tools import RxDCa, RxDpmca, RxDncx
+from cells.core.cell_hoc import CellHOC
+from cells.core.cell_rxd import CellRxD
+from cells.core.cell_spine import CellSpine
+from cells.core.rxd_tools import RxDCa, RxDpmca, RxDncx
 from utils import plot_cai, plot_v
 
 RUNTIME = 1000 * ms
