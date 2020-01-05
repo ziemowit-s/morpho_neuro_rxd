@@ -8,7 +8,7 @@ from cells.core.cell_hoc import CellHOC
 from cells.core.cell_rxd import CellRxD
 from cells.core.cell_spine import CellSpine
 from cells.core.rxd_tools import RxDCa
-from utils import plot_cai
+from utils import get_shape_plot
 
 RUNTIME = 5000 * ms
 STEPSIZE = 0.01 * ms
@@ -45,7 +45,7 @@ if __name__ == '__main__':
     h.cvode.re_init()
 
     # plots
-    ps = plot_cai()
+    ps = get_shape_plot(variable='cai', min_val=0, max_val=0.01)
 
     print("sleep before run for: %s seconds" % INIT_SLEEP)
     time.sleep(INIT_SLEEP)

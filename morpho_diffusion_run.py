@@ -8,7 +8,7 @@ from cells.core.cell_hoc import CellHOC
 from cells.core.cell_rxd import CellRxD
 from cells.core.cell_spine import CellSpine
 from cells.core.rxd_tools import RxDCa, RxDpmca, RxDncx
-from utils import plot_cai, plot_v
+from utils import connect_net_stim, get_shape_plot
 
 RUNTIME = 1000 * ms
 STEPSIZE = 0.01 * ms
@@ -85,19 +85,11 @@ def make_head_ca2_concentration(cell):
             n.concentration = 1.0
 
 
-def get_con(syn, weight, delay):
-    stim = h.NetStim()
-    con = h.NetCon(stim, syn)
-    con.delay = delay
-    con.weight[0] = weight
-    return stim, con
-
-
 def get_ampa(sec, weight, delay):
     ampa = h.ExpSyn(sec(0.5))
     ampa.tau = 0.5
     ampa.e = 0
-    stim, con = get_con(ampa, weight, delay)
+    stim, con = connect_net_stim(ampa, weight, delay)
     return ampa, stim, con
 
 
@@ -107,7 +99,7 @@ def get_nmda(sec, weight, delay):
     nmda.tcon = 3
     nmda.tcoff = 100
     nmda.mgconc = 1  # (mM) standard Mg concnmda.gamma = 0.08 Larkum Science 2009 (sharpens voltage curve)
-    stim, con = get_con(nmda, weight, delay)
+    stim, con = connect_net_stim(nmda, weight, delay)
     return nmda, stim, con
 
 
@@ -133,8 +125,8 @@ if __name__ == '__main__':
     h.cvode.re_init()
 
     # plots
-    ps_cai = plot_cai()
-    ps_v = plot_v()
+    ps_cai = get_shape_plot(variable='cai', min_val=0, max_val=0.01)
+    ps_v = get_shape_plot(variable='v', min_val=-70, max_val=40)
 
     print("sleep before run for: %s seconds" % INIT_SLEEP)
     time.sleep(INIT_SLEEP)
