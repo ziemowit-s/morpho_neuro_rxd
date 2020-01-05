@@ -18,7 +18,7 @@ INIT_SLEEP = 3  # seconds
 max_delay = DELAY / 1000  # in seconds
 
 
-class CellSWCRxDCaSpine(CellRxD, CellSpine, CellHOC):
+class CellRxDCaSpine(CellRxD, CellSpine, CellHOC):
     def __init__(self, name):
         CellRxD.__init__(self, name)
         CellSpine.__init__(self, name)
@@ -117,8 +117,8 @@ if __name__ == '__main__':
     h.cvode.active(1)
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
-    cell = CellSWCRxDCaSpine(name="cell")
-    cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
+    cell = CellRxDCaSpine(name="cell")
+    cell.load_morpho(filepath='morphologies/asc/cell1.asc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_rxd(rxd_obj=RxDCa(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
