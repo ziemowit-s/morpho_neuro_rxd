@@ -1,7 +1,7 @@
 import time
 
 from neuron import h
-from neuron.units import mV
+from neuron.units import mV, ms
 
 from cells.cell_ebner2019 import CellEbner2019
 from cells.core.cell_rxd import CellRxD
@@ -23,32 +23,34 @@ DUR = 2.0			# ms, duration of the current injection
 COOL_DOWN = 100		# ms, silence phase after stimulation
 FREQ = 200			# Hz, frequency of postsynaptic spikes
 WEIGHT = 0.0035		# µS, conductance of (single) synaptic potentials
+WARMUP = 200
 
 if __name__ == '__main__':
     h.load_file('stdrun.hoc')
-    h.cvode.atol(1e-8)
-    h.cvode.active(1)
-    h.dt = .1
 
     cell = CellEbnerRxDCaSpine(name="cell")
     cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
+
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
+
     cell.add_soma_mechanisms()
     cell.add_apical_mechanisms(sections='dend head neck')
     cell.add_4p_synapse(sections="head", loc=0.99)
 
-    stim, con = connect_net_stim(list(cell.synapses_4p.values())[0], weight=WEIGHT, delay=10)
+    for syn in cell.synapses_4p.values():
+        stim, con = connect_net_stim(syn, weight=WEIGHT, delay=1)
 
     # init
-    h.finitialize(-65 * mV)
-    h.cvode.re_init()
+    h.finitialize(-70 * mV)
+    #h.dt = 10
+    #h.continuerun(WARMUP * ms)  # warmup
+    h.dt = 0.025
 
     # plots
-    ps_ca = get_shape_plot(variable='ica', min_val=-3, max_val=10)
     ps_v = get_shape_plot(variable='v')
 
     init_sleep = 3  # seconds
     print("sleep before run for: %s seconds" % init_sleep)
     time.sleep(init_sleep)
 
-    run_sim(runtime=1000, stepsize=100, delay_between_steps=500, plot_shapes=[ps_ca, ps_v])
+    run_sim(runtime=1000, stepsize=1, delay_between_steps=500, plot_shapes=[ps_v])
