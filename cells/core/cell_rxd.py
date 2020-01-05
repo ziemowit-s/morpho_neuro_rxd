@@ -7,7 +7,7 @@ from cells.core.rxd_tools import RxDTool
 class CellRxD(Cell):
     def __init__(self, name):
         """
-        @param name:
+        :param name:
             Name of the cell
         """
         Cell.__init__(self, name)
@@ -21,10 +21,10 @@ class CellRxD(Cell):
 
     def add_rxd(self, rxd_obj: RxDTool, sections, is_3d=False, threads=1, dx_3d_size=None):
         """
-        @param is_3d:
-        @param threads:
-        @param dx_3d_size:
-        @param sections:
+        :param is_3d:
+        :param threads:
+        :param dx_3d_size:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """

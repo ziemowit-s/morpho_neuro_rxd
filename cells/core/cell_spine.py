@@ -15,13 +15,13 @@ class CellSpine(Cell):
           * head: L=1um diam=1um
           * neck: L=0.5um diam=0.5um
 
-        @param spine_number:
+        :param spine_number:
             The number of spines to create
-        @param sections:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
-        @param head_nseg
-        @param neck_nseg
+        :param head_nseg
+        :param neck_nseg
         """
         if sections == 'all':
             sections = self.secs
@@ -40,8 +40,8 @@ class CellSpine(Cell):
     def _connect_necks_rand_uniform(self, necks, sections):
         """
         Connect necks list to sections list with uniform random distribution
-        @param necks:
-        @param sections:
+        :param necks:
+        :param sections:
         """
         max_l = int(sum([s.L for s in sections]))
         added = dict([(s.name(), []) for s in sections])

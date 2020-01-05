@@ -7,7 +7,7 @@ class CellHay2011(Cell):
 
     def add_soma_mechanisms(self, sections='soma'):
         """
-        @param sections:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """
@@ -38,7 +38,7 @@ class CellHay2011(Cell):
 
     def add_axonal_mechanisms(self, sections='axon'):
         """
-        @param sections:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """
@@ -75,7 +75,7 @@ class CellHay2011(Cell):
 
     def add_apical_mechanisms(self, sections='apic'):
         """
-        @param sections:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """
@@ -104,7 +104,7 @@ class CellHay2011(Cell):
 
     def add_basal_mechanisms(self, sections='basal'):
         """
-        @param sections:
+        :param sections:
             list of sections or string defining single section name or sections names separated by space
             param 'all' - takes all sections
         """

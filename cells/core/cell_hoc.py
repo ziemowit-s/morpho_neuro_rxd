@@ -7,11 +7,11 @@ from cells.core.cell import Cell
 class CellHOC(Cell):
     def add_hoc(self, hoc_file, seg_per_L_um=1.0, add_const_segs=11):
         """
-        @param hoc_file:
+        :param hoc_file:
             paths to hoc file
-        @param seg_per_L_um:
+        :param seg_per_L_um:
             how many segments per single um of L, Length.  Can be < 1. None is 0.
-        @param add_const_segs:
+        :param add_const_segs:
             how many segments have each section by default.
             With each um of L this number will be increased by seg_per_L_um
         """

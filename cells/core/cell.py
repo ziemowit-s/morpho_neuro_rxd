@@ -9,7 +9,7 @@ h.load_file('import3d.hoc')
 class Cell:
     def __init__(self, name):
         """
-        @param name:
+        :param name:
             Name of the cell
         """
         # if Cell (named core_cell) have been built before on the stack of super() objects
@@ -21,7 +21,7 @@ class Cell:
 
     def add_mechanism(self, mechanism=None):
         """
-        @param mechanism:
+        :param mechanism:
             Single MOD mechanism or a list of MOD mechanisms
         """
         if not isinstance(mechanism, list):
@@ -31,11 +31,11 @@ class Cell:
     def add_cylindric_sec(self, name, diam=None, l=None, nseg=1, mechanisms='all'):
         """
 
-        @param name:
-        @param diam:
-        @param l:
-        @param nseg:
-        @param mechanisms:
+        :param name:
+        :param diam:
+        :param l:
+        :param nseg:
+        :param mechanisms:
             string of mechanisms or list of strings of selected mechanisms.
         @return:
         """
@@ -62,7 +62,7 @@ class Cell:
 
     def filter_secs(self, left):
         """
-        @param left:
+        :param left:
             list of sections or string defining single section name or sections names separated by space
         @:return
             dict[sec_name] = sec
@@ -89,11 +89,11 @@ class Cell:
 
     def load_morpho(self, filepath, seg_per_L_um=1.0, add_const_segs=11):
         """
-        @param filepath:
+        :param filepath:
             swc file path
-        @param seg_per_L_um:
+        :param seg_per_L_um:
             how many segments per single um of L, Length.  Can be < 1. None is 0.
-        @param add_const_segs:
+        :param add_const_segs:
             how many segments have each section by default.
             With each um of L this number will be increased by seg_per_L_um
         """

@@ -11,10 +11,10 @@ class RxDTool:
     def load(self, sections, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
-        @param sections:
-        @param dx_3d_size:
+        :param sections:
+        :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
-        @param rxds:
+        :param rxds:
             dictionary which contains previously added RxDTool objects
         """
         raise NotImplementedError
@@ -25,10 +25,10 @@ class RxDCa(RxDTool):
     def load(self, sections, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
-        @param secs:
-        @param dx_3d_size:
+        :param secs:
+        :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
-        @param rxds:
+        :param rxds:
             dictionary which contains previously added RxDTool objects
         """
         self.cyt = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
@@ -56,10 +56,10 @@ class RxDpmca(RxDTool):
     def load(self, sections, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
-        @param secs:
-        @param dx_3d_size:
+        :param secs:
+        :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
-        @param rxds:
+        :param rxds:
             dictionary which contains previously added RxDTool objects
         """
 
@@ -78,10 +78,10 @@ class RxDncx(RxDTool):
     def load(self, sections, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
-        @param secs:
-        @param dx_3d_size:
+        :param secs:
+        :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
-        @param rxds:
+        :param rxds:
             dictionary which contains previously added RxDTool objects
         """
         rxdca = rxds['RxDCa']
