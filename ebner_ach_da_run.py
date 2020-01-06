@@ -13,14 +13,9 @@ class CellEbnerRxDCaSpine(CellEbner2019AChDA, CellSpine):
         CellEbner2019AChDA.__init__(self, name)
 
 
-REPS = 3			# Number of postsynaptic spikes
-DT = 0.025 			# ms, integration step
-AMP = 5.5 			# nA, amplitude of current injection to trigger postsynaptic spikes
-DUR = 2.0			# ms, duration of the current injection
-COOL_DOWN = 100		# ms, silence phase after stimulation
-FREQ = 200			# Hz, frequency of postsynaptic spikes
 WEIGHT = 0.0035		# µS, conductance of (single) synaptic potentials
 WARMUP = 200
+
 
 if __name__ == '__main__':
     h.load_file('stdrun.hoc')
@@ -31,17 +26,17 @@ if __name__ == '__main__':
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_soma_mechanisms()
     cell.add_apical_mechanisms(sections='dend head neck')
-    cell.add_4p_ach_da_synapse(sections="head", loc=0.99)
+    cell.add_4p_ach_da_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
-    #cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1)
+    cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1)
 
     # create plots
     rec = Record(cell.filter_secs("soma head[0]"), locs=0.5, variables="v")
 
     # init and run
     h.finitialize(-70 * mV)
-    run_sim(runtime=100, warmup=WARMUP)
+    run_sim(runtime=100, warmup=0)
 
     # plot
     rec.plot()

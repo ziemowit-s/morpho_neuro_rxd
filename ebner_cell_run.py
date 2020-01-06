@@ -31,7 +31,7 @@ if __name__ == '__main__':
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_soma_mechanisms()
     cell.add_apical_mechanisms(sections='dend head neck')
-    cell.add_4p_synapse(sections="head", loc=0.99)
+    cell.add_4p_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
     cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1)
