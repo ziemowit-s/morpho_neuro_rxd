@@ -9,6 +9,8 @@ ENDCOMMENT
   	: Pointers for ACh and DA synapse
   	POINTER ACh
   	POINTER Da
+  	POINTER tau_ACh
+  	POINTER tau_Da
   	: Parameters & variables of the original Exp2Syn
   	RANGE tau_a, tau_b, e, i
   
@@ -23,6 +25,8 @@ ENDCOMMENT
   	RANGE tau_u_T, theta_u_T, m_T
   	RANGE theta_u_N, tau_Z_a, tau_Z_b, m_Z, tau_N_alpha, tau_N_beta, m_N_alpha, m_N_beta, theta_N_X
   	RANGE theta_u_C, theta_C_minus, theta_C_plus, tau_K_alpha, tau_K_gamma, m_K_alpha, m_K_beta, s_K_beta
+
+  	RANGE LTD_post, LTP_post
   }
   
   UNITS {
@@ -75,6 +79,9 @@ ENDCOMMENT
   	m_K_alpha = 1.5						: slope of the saturation function for K_alpha
   	m_K_beta = 1.7						: slope of the saturation function for K_beta
   	s_K_beta = 100						: scaling factor for calculation of K_beta
+
+  	LTD_post = 0
+  	LTP_post = 0
   }
   
   ASSIGNED {
@@ -107,6 +114,8 @@ ENDCOMMENT
   	last_weight
   	ACh
   	Da
+  	tau_ACh
+  	tau_Da
   }
   
   STATE {
@@ -184,8 +193,9 @@ ENDCOMMENT
   }
   
   DERIVATIVE state {
-  	LOCAL D, u, Eta, LTD_pre, LTP_pre, LTD_post, LTP_post, g_update, N_alpha, N_beta, N
-  
+  	:LOCAL D, u, Eta, LTD_pre, LTP_pre, LTD_post, LTP_post, g_update, N_alpha, N_beta, N
+  	LOCAL D, u, Eta, LTD_pre, LTP_pre, g_update, N_alpha, N_beta, N
+
   	if(flag_D == 1) {	: Check if there is a presynaptic event
   		D = 1
   	    flag_D = -1
@@ -223,33 +233,31 @@ ENDCOMMENT
   	Rho = 1.0 - K_beta
   	K_gamma' = (- K_gamma + K_beta) / tau_K_gamma
   	K = K_alpha * K_beta * K_gamma
-  
-  	: Pathway outcomes
-  	LTD_pre = - A_LTD_pre * E
-  	LTP_pre	= A_LTP_pre * X * Eta			: apply Eta to make values invariant to changes in dt
-  	LTD_post = - A_LTD_post * P * Eta
-  	LTP_post = A_LTP_post * K * Eta
-  
-      : ACh calculation
-  	LTD_post = (1-ACh)*LTD_post + ACh * Eta
-  	LTP_post = (1-ACh)*LTP_post - ACh * Eta
-  	if(ACh > 1.0) {
+
+    : ACh/Da
+    if(ACh > 1.0) {
   		ACh = 1.0
   	}
   	if(ACh < 0.0) {
   		ACh = 0.0
   	}
-  
-  	: DA calculation
-  	LTD_post = (1-Da)*LTD_post - Da * Eta
-  	LTP_post = (1-Da)*LTP_post + Da * Eta
-      if(Da > 1.0) {
+    if(Da > 1.0) {
   		Da = 1.0
   	}
   	if(Da < 0.0) {
   		Da = 0.0
   	}
-  
+
+  	: Pathway outcomes
+  	LTD_pre = - A_LTD_pre * E
+  	LTP_pre	= A_LTP_pre * X * Eta			: apply Eta to make values invariant to changes in dt
+
+  	:LTD_post = -( ((1-ACh) * (1-Da) * A_LTD_post * P * Eta) + (ACh * Eta * (1-Da)) )
+  	:LTP_post =    ((1-ACh) * (1-Da) * A_LTP_post * K * Eta) + (Da * Eta)
+
+    LTD_post = -( (A_LTD_post * P * Eta) + (ACh * Eta * (1-Da)) )
+  	LTP_post =    (A_LTP_post * K * Eta) + (Da * Eta)
+
   	: Update weights
   	w_pre = w_pre + LTD_pre + LTP_pre
   	if(w_pre > 1.0) {

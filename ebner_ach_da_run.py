@@ -29,12 +29,14 @@ if __name__ == '__main__':
     cell.add_4p_ach_da_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
-    cell.add_net_stim("syns_ach", weight=1, start=WARMUP+1, delay=1, synapses="head[0]")
-    cell.add_net_stim("syns_da", weight=1, start=WARMUP+1, delay=1, synapses="head[0]")
     cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_da", weight=WEIGHT, start=WARMUP+50, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_ach", weight=WEIGHT, start=WARMUP+100, delay=1, synapses="head[0]")
 
     # create plots
-    rec_w = Record(cell.filter_syns("syns_4p", "head[0]"), variables="w")
+    rec_ltd = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_post")
+    rec_ltp = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTP_post")
+
     rec_ach = Record(cell.filter_syns("syns_4p", "head[0]"), variables="ACh")
     rec_da = Record(cell.filter_syns("syns_4p", "head[0]"), variables="Da")
 
@@ -43,6 +45,7 @@ if __name__ == '__main__':
     run_sim(runtime=500, warmup=WARMUP)
 
     # plot
-    rec_w.plot()
+    rec_ltd.plot()
+    rec_ltp.plot()
     rec_ach.plot()
     rec_da.plot()
