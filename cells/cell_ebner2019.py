@@ -5,13 +5,13 @@ from cells.cell_hay2011 import CellHay2011
 class CellEbner2019(CellHay2011):
     def __init__(self, name):
         CellHay2011.__init__(self, name)
-        self.synapses_4p = {}
+        self.syns_4p = {}
 
     def add_4p_synapse(self, sections, loc):
         secs = self.filter_secs(left=sections)
         for name, s in secs.items():
             syn = h.Syn4P(s(loc))
-            self.synapses_4p[name] = syn
+            self.syns_4p[name] = syn
 
             syn.tau_a = 0.2  # time constant of EPSP rise
             syn.tau_b = 2  # time constant of EPSP decay

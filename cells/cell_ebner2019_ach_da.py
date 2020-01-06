@@ -16,7 +16,8 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
         secs = self.filter_secs(left=sections)
         for name, s in secs.items():
             # Add 4p syn
-            self._make_4p_syn(name, s, loc)
+            syn_4p = self._make_4p_syn(s, loc)
+            self.syns_4p[name] = syn_4p
 
             # Add ACh syn
             syn_ach = h.SynACh(s(loc))
@@ -28,10 +29,20 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
             self.syns_da[name] = syn_da
             syn_da.tau = 2000
 
-    def _make_4p_syn(self, name, sec, loc):
-        syn_4p = h.Syn4PAChDa(sec(loc))
-        self.syns_4p[name] = syn_4p
+            # set pointer
+            #
+            # Example in HOC:
+            # objref syn
+            # somedendrite syn = new GradSyn(0.8)
+            # setpointer syn.cp, precell.bouton.cai(0.5)
+            #
+            # Python Example:
+            # h.setpointer(sec['hSec'](.5)._ref_ecl, 'e', sec['synMechs'][0]['hSyn'])
+            h.setpointer(syn_4p._ref_ACh, 'ACh', syn_4p)
+            h.setpointer(syn_4p._ref_Da, 'Da', syn_4p)
 
+    def _make_4p_syn(self, sec, loc):
+        syn_4p = h.Syn4PAChDa(sec(loc))
         syn_4p.tau_a = 0.2  # time constant of EPSP rise
         syn_4p.tau_b = 2  # time constant of EPSP decay
         syn_4p.e = 0  # reversal potential
@@ -66,3 +77,4 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
         syn_4p.m_K_alpha = 1.5  # slope of the saturation function for K_alpha
         syn_4p.m_K_beta = 1.7  # slope of the saturation function for K_beta
         syn_4p.s_K_beta = 100  # scaling factor for calculation of K_beta
+        return syn_4p
