@@ -69,10 +69,38 @@ class Cell:
         :return
             dict[sec_name] = sec
         """
+        return self._filter_obj_dict("secs", left, as_list)
+
+    def _filter_obj_dict(self, obj_dict_name, left=None, as_list=False):
+        """
+        :param obj_dict_name:
+            name of the attribute dict with structure dict[name] = value
+        :param left:
+            list of synapses or string defining single synapse name or synapse names separated by space. If None - all will be left
+        :param as_list:
+            if return as list. Otherwise will return as dict with name as key
+        :return
+            dict[sec_name] = sec
+        """
         if isinstance(left, str):
             left = left.split(' ')
+
+        if not hasattr(self, obj_dict_name):
+            raise ProcessLookupError("Object of class %s has no dict attribute of %s." % (self.__class__.__name__, obj_dict_name))
+
+        obj_dict = getattr(self, obj_dict_name)
+        if not isinstance(obj_dict, dict):
+            raise AttributeError("Object of class %s has attribute %s, but it is not a dictionary." % (self.__class__.__name__, obj_dict_name))
+
         result = [] if as_list else {}
-        for k, v in self.secs.items():
+        for k, v in obj_dict.items():
+            if left is None:
+                if as_list:
+                    result.append(v)
+                else:
+                    result[k] = v
+                continue
+
             for s in left:
                 # section names (especially created by NEURON or hoc) frequently have array-like string name
                 # eg. soma[0]. User can specify exact name eg. dend[12]
@@ -88,8 +116,13 @@ class Cell:
                     else:
                         result[k] = v
                     break
+
         if len(result) == 0:
-            raise LookupError("Cannot found sections:", left)
+            if left:
+                raise LookupError("Cannot find sections of type %s and named %s" % (obj_dict_name, left))
+            else:
+                raise LookupError("Cannot find any sections of type %s." % obj_dict_name)
+
         return result
 
     def load_morpho(self, filepath, seg_per_L_um=1.0, add_const_segs=11):
