@@ -1,10 +1,12 @@
 from neuron import h
 from cells.cell_hay2011 import CellHay2011
+from cells.core.cell_point_process import CellPointProcess
 
 
-class CellEbner2019(CellHay2011):
+class CellEbner2019(CellHay2011, CellPointProcess):
     def __init__(self, name):
         CellHay2011.__init__(self, name)
+        CellPointProcess.__init__(self, name)
         self.syns_4p = {}
 
     def add_4p_synapse(self, sections, loc):

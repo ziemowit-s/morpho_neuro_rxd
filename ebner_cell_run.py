@@ -34,8 +34,7 @@ if __name__ == '__main__':
     cell.add_4p_synapse(sections="head", loc=0.99)
 
     # stimulation
-    for syn in cell.syns_4p.values():
-        stim, con = connect_net_stim(syn, weight=WEIGHT, delay=WARMUP+1)
+    cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1)
 
     # create plots
     rec = Record(cell.filter_secs("soma head[0]"), locs=0.5, variables="v")
