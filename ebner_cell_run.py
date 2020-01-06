@@ -2,11 +2,12 @@ import time
 
 from neuron import h
 from neuron.units import mV, ms
+import matplotlib.pyplot as plt
 
 from cells.cell_ebner2019 import CellEbner2019
 from cells.core.cell_rxd import CellRxD
 from cells.core.cell_spine import CellSpine
-from utils import connect_net_stim, run_sim, get_shape_plot
+from utils import run_sim, get_shape_plot, Records, connect_net_stim
 
 
 class CellEbnerRxDCaSpine(CellEbner2019, CellRxD, CellSpine):
@@ -38,19 +39,19 @@ if __name__ == '__main__':
     cell.add_4p_synapse(sections="head", loc=0.99)
 
     for syn in cell.synapses_4p.values():
-        stim, con = connect_net_stim(syn, weight=WEIGHT, delay=1)
+        stim, con = connect_net_stim(syn, weight=WEIGHT, delay=WARMUP+1)
+
+    # shape plots
+    #ps_v = get_shape_plot(variable='v')
+    rec = Records(cell.filter_secs("soma", as_list=True), loc=0.5, variables="v")
 
     # init
     h.finitialize(-70 * mV)
-    #h.dt = 10
-    #h.continuerun(WARMUP * ms)  # warmup
-    h.dt = 0.025
 
-    # plots
-    ps_v = get_shape_plot(variable='v')
-
-    init_sleep = 3  # seconds
+    init_sleep = 0  # seconds
     print("sleep before run for: %s seconds" % init_sleep)
     time.sleep(init_sleep)
 
-    run_sim(runtime=1000, stepsize=1, delay_between_steps=500, plot_shapes=[ps_v])
+    run_sim(runtime=150, stepsize=100, delay_between_steps=500, warmup=WARMUP)
+
+    rec.plot()

@@ -60,16 +60,18 @@ class Cell:
         to = list(self.filter_secs(to).values())[0]
         fr.connect(to(to_loc), fr_loc)
 
-    def filter_secs(self, left):
+    def filter_secs(self, left, as_list=False):
         """
         :param left:
             list of sections or string defining single section name or sections names separated by space
-        @:return
+        :param as_list:
+            if return as list. Otherwise will return as dict with name as key
+        :return
             dict[sec_name] = sec
         """
         if isinstance(left, str):
             left = left.split(' ')
-        result = {}
+        result = [] if as_list else {}
         for k, v in self.secs.items():
             for s in left:
                 # section names (especially created by NEURON or hoc) frequently have array-like string name
@@ -81,7 +83,10 @@ class Cell:
                 else:
                     sec_name = k
                 if s.lower() == sec_name.lower():
-                    result[k] = v
+                    if as_list:
+                        result.append(v)
+                    else:
+                        result[k] = v
                     break
         if len(result) == 0:
             raise LookupError("Cannot found sections:", left)
