@@ -20,7 +20,7 @@ class Record:
         if isinstance(variables, str):
             variables = variables.split(' ')
 
-        if isinstance(locs, float):
+        if isinstance(locs, float) or isinstance(locs, int):
             locs = [locs for _ in range(len(sections))]
 
         if len(locs) != len(sections):

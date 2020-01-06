@@ -8,14 +8,8 @@ from cells.core.cell_hoc import CellHOC
 from cells.core.cell_rxd import CellRxD
 from cells.core.cell_spine import CellSpine
 from cells.core.rxd_tools import RxDCa, RxDpmca, RxDncx
-from utils.utils import connect_net_stim, get_shape_plot
-
-RUNTIME = 1000 * ms
-STEPSIZE = 0.01 * ms
-DELAY = 1 * ms  # between steps
-INIT_SLEEP = 3  # seconds
-
-max_delay = DELAY / 1000  # in seconds
+from utils.Record import Record
+from utils.utils import connect_net_stim, get_shape_plot, run_sim
 
 
 class CellRxDCaSpine(CellRxD, CellSpine, CellHOC):
@@ -109,45 +103,24 @@ if __name__ == '__main__':
     h.cvode.active(1)
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
+    # define cell
     cell = CellRxDCaSpine(name="cell")
-    cell.load_morpho(filepath='morphologies/asc/cell1.asc', seg_per_L_um=1, add_const_segs=11)
+    cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_rxd(rxd_obj=RxDCa(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
     cell.add_rxd(rxd_obj=RxDncx(), sections="head neck")
 
-    # init
-    h.finitialize(-65 * mV)
-
-    #make_stim(cell)
-    make_head_ca2_concentration(cell)
-
-    h.cvode.re_init()
-
     # plots
     ps_cai = get_shape_plot(variable='cai', min_val=0, max_val=0.01)
     ps_v = get_shape_plot(variable='v', min_val=-70, max_val=40)
+    rec = Record(cell.filter_secs("head[0]"), locs=1, variables='ica cai')
 
-    print("sleep before run for: %s seconds" % INIT_SLEEP)
-    time.sleep(INIT_SLEEP)
+    # init and run
+    h.finitialize(-65 * mV)
+    # make_stim(cell)
+    make_head_ca2_concentration(cell)
+    h.cvode.re_init()
+    run_sim(runtime=100, stepsize=0.1, init_sleep=3, delay_between_steps=50, plot_shapes=[ps_cai, ps_v])
 
-    # run main loop
-    before = time.time()  # compute time before
-    for i in np.arange(0, RUNTIME, STEPSIZE):
-
-        # step till i-th ms
-        h.continuerun(i * ms)
-        current = time.time()
-        computation_time = current - before
-
-        # adjust delay
-        delay = max_delay - computation_time
-        if delay < 0:
-            delay = 0
-        time.sleep(delay)
-        before = time.time()  # compute time before
-
-        # flush shape and console log
-        ps_cai.fastflush()
-        ps_v.fastflush()
-        print(round(i, 2), "ms", '// comp_time_ms:', round(computation_time * 1000, 0))
+    rec.plot()

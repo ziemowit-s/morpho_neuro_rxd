@@ -1,11 +1,10 @@
 import time
-
+import numpy as np
 from neuron import h
 from neuron.units import ms
 
 
 def get_shape_plot(variable, min_val=-70, max_val=40):
-    # plot shape
     ps = h.PlotShape(True)
     ps.variable(variable)
     ps.scale(min_val, max_val)
@@ -23,7 +22,7 @@ def connect_net_stim(syn, weight, delay):
     return stim, con
 
 
-def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=0, dt=0.025, plot_shapes=()):
+def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=0, dt=0.025, plot_shapes=(), init_sleep=0):
     """
 
     :param runtime:
@@ -38,7 +37,12 @@ def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=
         in ms, for warmup with dt=10*ms
     :param plot_shapes:
         list of plotshapes to flush
+    :param init_sleep
+        sleep time in seconds. To sleep before first run
     """
+    print("sleep before run for: %s seconds" % init_sleep)
+    time.sleep(init_sleep)
+
     if stepsize is None:
         stepsize = runtime
     if warmup > 0:
@@ -50,10 +54,14 @@ def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=
 
     # prepare run array
     max_runtime = runtime+warmup+start_from
-    run_array = [i for i in range(0+warmup+start_from+stepsize, max_runtime+1, stepsize)]
-    left_run = max_runtime - max(run_array)
-    if left_run > 0:
-        run_array = run_array + [max_runtime]
+
+    if runtime == stepsize:
+        run_array = [warmup+start_from+stepsize]
+    else:
+        run_array = np.arange(0+warmup+start_from+stepsize, max_runtime, stepsize)
+        left_run = max_runtime - max(run_array)
+        if left_run > 0:
+            run_array = np.concatenate([run_array, [max_runtime]])
 
     # run main loop
     before = time.time()  # compute time before
@@ -74,5 +82,5 @@ def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=
         # flush shape and console log
         for ps in plot_shapes:
             ps.fastflush()
-        print(stepsize, "ms", '// comp_time_ms:', round(computation_time * 1000, 0))
+        print(round(r, 2), "ms", '// comp_time:', round(computation_time * 1000, 2), "ms")
 
