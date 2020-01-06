@@ -29,7 +29,7 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
             syn_da.tau = 2000
 
     def _make_4p_syn(self, name, sec, loc):
-        syn_4p = h.Syn4PAChDA(sec(loc))
+        syn_4p = h.Syn4PAChDa(sec(loc))
         self.syns_4p[name] = syn_4p
 
         syn_4p.tau_a = 0.2  # time constant of EPSP rise
