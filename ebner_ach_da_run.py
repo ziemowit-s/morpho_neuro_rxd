@@ -29,14 +29,20 @@ if __name__ == '__main__':
     cell.add_4p_ach_da_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
-    cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1)
+    cell.add_net_stim("syns_ach", weight=1, start=WARMUP+1, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_da", weight=1, start=WARMUP+1, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1, synapses="head[0]")
 
     # create plots
-    rec = Record(cell.filter_secs("soma head[0]"), locs=0.5, variables="v")
+    rec_w = Record(cell.filter_syns("syns_4p", "head[0]"), variables="w")
+    rec_ach = Record(cell.filter_syns("syns_4p", "head[0]"), variables="ACh")
+    rec_da = Record(cell.filter_syns("syns_4p", "head[0]"), variables="Da")
 
     # init and run
     h.finitialize(-70 * mV)
-    run_sim(runtime=100, warmup=0)
+    run_sim(runtime=500, warmup=WARMUP)
 
     # plot
-    rec.plot()
+    rec_w.plot()
+    rec_ach.plot()
+    rec_da.plot()

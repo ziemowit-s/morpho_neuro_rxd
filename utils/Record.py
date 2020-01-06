@@ -7,20 +7,21 @@ import matplotlib.pyplot as plt
 
 
 class Record:
-    def __init__(self, sections: dict, locs, variables):
+    def __init__(self, sections: dict, variables, locs=None):
         """
 
         :param sections:
             dict[section_name] = sec
         :param locs:
             float (if loc for all sections is the same), or list of floats (in that case len must be the same as len(sections).
+            Default None. If None - loc will be skipped (eg. for point process)
         :param variables:
             str or list_of_str of variable names to track
         """
         if isinstance(variables, str):
             variables = variables.split(' ')
 
-        if isinstance(locs, float) or isinstance(locs, int):
+        if isinstance(locs, float) or isinstance(locs, int) or locs is None:
             locs = [locs for _ in range(len(sections))]
 
         if len(locs) != len(sections):
@@ -30,7 +31,9 @@ class Record:
 
         for (sec_name, sec), loc in zip(sections.items(), locs):
             for var in variables:
-                s = getattr(sec(loc), "_ref_%s" % var)
+                s = sec if loc is None else sec(loc)
+                s = getattr(s, "_ref_%s" % var)
+
                 rec = h.Vector().record(s)
                 self.recs[var].append(("%s(%s)" % (sec_name, loc), rec))
 

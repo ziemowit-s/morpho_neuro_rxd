@@ -10,8 +10,12 @@ class CellPointProcess(Cell):
             Name of the cell
         """
         Cell.__init__(self, name)
-        self.stimulations = {}
-        self.connections = {}
+        self.stims = {}
+        self.conns = {}
+        self.syn_num = 0
+
+    def filter_syns(self, synapse_type, synapses, as_list=False):
+        return self._filter_obj_dict(synapse_type, synapses, as_list)
 
     def add_net_stim(self, synapse_type, weight, start, delay=0, number=1, interval=1, noise=0, synapses=None):
         """
@@ -34,9 +38,12 @@ class CellPointProcess(Cell):
         syns = self._filter_obj_dict(synapse_type, synapses)
 
         for name, syn in syns.items():
+            name = "%s_%s[%s]" % (synapse_type, name, self.syn_num)
+            self.syn_num += 1
+
             stim, con = self._connect_net_stim(syn, weight=weight, delay=delay, start=start, number=number, interval=interval, noise=noise)
-            self.stimulations[name] = stim
-            self.connections[name] = con
+            self.stims[name] = stim
+            self.conns[name] = con
 
     @staticmethod
     def _connect_net_stim(syn, weight, delay, start, number, interval, noise):
