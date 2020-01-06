@@ -1,40 +1,7 @@
 import time
-from math import ceil
-
-import numpy as np
 
 from neuron import h
 from neuron.units import ms
-import matplotlib.pyplot as plt
-
-
-class Records:
-    def __init__(self, sections, loc, variables):
-        if isinstance(variables, str):
-            variables = variables.split(' ')
-
-        self.recs = dict([(v, []) for v in variables])
-        for sec in sections:
-            for var in variables:
-                s = getattr(sec(loc), "_ref_%s" % var)
-                rec = h.Vector().record(s)
-                self.recs[var].append(rec)
-
-        self.t = h.Vector().record(h._ref_t)
-
-    def plot(self, max_plot_on_fig=4):
-        for name, recs in self.recs.items():
-            ceil_len = ceil(len(recs)/max_plot_on_fig)
-
-            for i in range(ceil_len):
-                current_recs = recs[i:i+max_plot_on_fig]
-                fig, axs = plt.subplots(len(current_recs))
-                axs = axs.flat if isinstance(axs, np.ndarray) else [axs]
-                for ax, rec in zip(axs, current_recs):
-                    ax.set_title(name)
-                    ax.plot(self.t, rec)
-                    ax.set(xlabel='t (ms)', ylabel=name)
-        plt.show()
 
 
 def get_shape_plot(variable, min_val=-70, max_val=40):
@@ -56,7 +23,7 @@ def connect_net_stim(syn, weight, delay):
     return stim, con
 
 
-def run_sim(runtime, start_from=0, stepsize=1, delay_between_steps=1, warmup=0, dt=0.025, plot_shapes=()):
+def run_sim(runtime, start_from=0, stepsize=None, delay_between_steps=1, warmup=0, dt=0.025, plot_shapes=()):
     """
 
     :param runtime:
@@ -64,7 +31,7 @@ def run_sim(runtime, start_from=0, stepsize=1, delay_between_steps=1, warmup=0, 
     :param start_from:
         in ms
     :param stepsize:
-        in ms
+        in ms. Default None -> stepsize is the size of runtime
     :param delay_between_steps:
         in ms
     :param warmup:
@@ -72,6 +39,8 @@ def run_sim(runtime, start_from=0, stepsize=1, delay_between_steps=1, warmup=0, 
     :param plot_shapes:
         list of plotshapes to flush
     """
+    if stepsize is None:
+        stepsize = runtime
     if warmup > 0:
         h.dt = 10
         h.continuerun(warmup * ms)

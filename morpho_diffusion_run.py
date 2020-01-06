@@ -8,7 +8,7 @@ from cells.core.cell_hoc import CellHOC
 from cells.core.cell_rxd import CellRxD
 from cells.core.cell_spine import CellSpine
 from cells.core.rxd_tools import RxDCa, RxDpmca, RxDncx
-from utils import connect_net_stim, get_shape_plot
+from utils.utils import connect_net_stim, get_shape_plot
 
 RUNTIME = 1000 * ms
 STEPSIZE = 0.01 * ms
