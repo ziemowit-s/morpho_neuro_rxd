@@ -37,7 +37,7 @@ if __name__ == '__main__':
 
     # stimulation
     cell.add_netcons(source=stim1, weight=WEIGHT, delay=1, pp_type_name="SynACh", sec_names="head[0][0]")
-    cell.add_netcons(source=stim1, weight=WEIGHT, delay=1, pp_type_name="SynDa", sec_names="head[0][0]")
+    cell.add_netcons(source=stim2, weight=WEIGHT, delay=1, pp_type_name="SynDa", sec_names="head[0][0]")
 
     # create plots
     rec_4psyn = Record(cell.filter_point_processes(pp_type_name="Syn4PAChDa", sec_names="head[0][0]"), variables="LTD_pre w")
