@@ -1,5 +1,6 @@
 from neuron import h
 from neuron.units import mV
+import matplotlib.pyplot as plt
 
 from cells.cell_ebner2019_ach_da import CellEbner2019AChDA
 from cells.core.cell_spine import CellSpine
@@ -34,18 +35,13 @@ if __name__ == '__main__':
     cell.add_net_stim("syns_ach", weight=WEIGHT, start=WARMUP+100, delay=1, synapses="head[0]")
 
     # create plots
-    rec_ltd = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_post")
-    rec_ltp = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTP_post")
+    rec_4psyn = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_post LTP_post w")
 
-    rec_ach = Record(cell.filter_syns("syns_4p", "head[0]"), variables="ACh")
-    rec_da = Record(cell.filter_syns("syns_4p", "head[0]"), variables="Da")
 
     # init and run
     h.finitialize(-70 * mV)
     run_sim(runtime=500, warmup=WARMUP)
 
     # plot
-    rec_ltd.plot()
-    rec_ltp.plot()
-    rec_ach.plot()
-    rec_da.plot()
+    rec_4psyn.plot()
+    plt.show()

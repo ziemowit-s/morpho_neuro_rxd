@@ -53,4 +53,3 @@ class Record:
                     ax.set_title("%s.%s" % (sec_name, var_name))
                     ax.plot(self.t, rec)
                     ax.set(xlabel='t (ms)', ylabel=var_name)
-        plt.show()
