@@ -36,8 +36,8 @@ if __name__ == '__main__':
     stim2 = s1.add_stim("stim2", start=WARMUP + 100)
 
     # stimulation
-    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynACh", sec_names="head[0]")
-    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynDa", sec_names="head[0]")
+    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynACh", sec_names="head[0][10]")
+    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynDa", sec_names="head[0][20]")
 
     # create plots
     rec_4psyn = Record(cell.filter_pprocs(pp_type="Syn4PAChDa", sec_names="head[0][0]"), variables="LTD_pre w")

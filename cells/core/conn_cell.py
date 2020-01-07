@@ -23,6 +23,9 @@ class ConnCell(PointProcessCell):
 
     def add_conn(self, source, weight, pp_type=None, sec_names=None, delay=0):
         """
+        All sec_names must contains index of the point process of the specific type.
+        eg. head[0][0] where head[0] is sec_name and [0] is index of the point process of the specific type.
+
         :param source:
         :param weight:
         :param pp_type:
