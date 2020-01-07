@@ -40,7 +40,7 @@ if __name__ == '__main__':
     cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynDa", sec_names="head[0]")
 
     # create plots
-    rec_4psyn = Record(cell.filter_pprocs("syns_4p", "head[0]"), variables="LTD_pre w")
+    rec_4psyn = Record(cell.filter_pprocs(pp_type="Syn4PAChDa", sec_names="head[0][0]"), variables="LTD_pre w")
 
     # init and run
     h.finitialize(-70 * mV)
