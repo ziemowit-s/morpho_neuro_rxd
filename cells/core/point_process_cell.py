@@ -52,11 +52,11 @@ class PointProcessCell(BasicCell):
             pp_instance = pp(sec(loc))
             result.append(pp_instance)
 
-            #for key, value in kwargs.items():
-            #    if not hasattr(pp_instance, key):
-            #        raise LookupError("Point Process of type %s has no attribute of type %s. "
-            #                          "Check if MOD file contains %s as a RANGE variable" % (name, key, key))
-            #    setattr(pp_instance, key, value)
+            for key, value in kwargs.items():
+                if not hasattr(pp_instance, key):
+                    raise LookupError("Point Process of type %s has no attribute of type %s. "
+                                      "Check if MOD file contains %s as a RANGE variable" % (name, key, key))
+                setattr(pp_instance, key, value)
 
             self.pprocs["%s_%s[%s]" % (name, sec_name, self.pprocs_num)] = pp_instance
             self.pprocs_num += 1
