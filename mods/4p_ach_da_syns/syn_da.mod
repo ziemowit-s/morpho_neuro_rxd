@@ -1,46 +1,48 @@
-  : setpointer syn.cp, precell.bouton.cai(0.5)
-  
   NEURON {
       POINT_PROCESS SynDa
-      RANGE g, tau
+      RANGE w, last_max_w, tau, flag_D
   }
-  
+
   UNITS {
       (nA) = (nanoamp)
       (mV) = (millivolt)
       (uS) = (microsiemens)
   }
-  
+
   PARAMETER {
-      tau = 2000 (ms) <1e-9, 1e9>
+      tau = 1000 (ms) <1e-9, 1e9>
   }
-  
+
   ASSIGNED {
-      
+    flag_D
+    last_max_w
   }
-  
-  STATE { 
-      g (uS) 
+
+  STATE {
+      w (uS)
   }
-  
-  INITIAL { 
-      g = 0 
+
+  INITIAL {
+      w = 0
+      last_max_w = 1e-9 : must be nonzero for 4p synapse
+      flag_D = -1
   }
-  
+
   BREAKPOINT {
-      SOLVE state METHOD cnexp
-      if(g > 1.0) {
-  		g = 1.0
-  	}
-  	if(g < 0.0) {
-  		g = 0.0
-  	}
+    SOLVE state METHOD cnexp
   }
-  
-  DERIVATIVE state { 
-      g' = -g/tau 
+
+  DERIVATIVE state {
+    : Check if there is a presynaptic event
+    if(flag_D == 1) {
+  	    flag_D = -1
+  	}
+
+  	w' = -w/tau
   }
-  
-  NET_RECEIVE(weight (uS)) { 
-      g = g + weight
+
+  NET_RECEIVE(weight (uS)) {
+    w = 1 * weight
+    last_max_w = weight
+    flag_D = 1
   }

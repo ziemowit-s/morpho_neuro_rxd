@@ -6,61 +6,66 @@ ENDCOMMENT
   
   NEURON {
   	POINT_PROCESS Syn4PAChDa
-  	: Pointers for ACh and DA synapse
+  	: Pointers for ACh and DA synapses
   	POINTER ACh
   	POINTER Da
-  	POINTER tau_ACh
-  	POINTER tau_Da
+
+  	POINTER flag_D_ACh
+  	POINTER flag_D_Da
+
+  	POINTER last_max_w_ACh
+  	POINTER last_max_w_Da
+
   	: Parameters & variables of the original Exp2Syn
   	RANGE tau_a, tau_b, e, i
-  
+
   	NONSPECIFIC_CURRENT i
-  
+
   	: Parameters & variables of the plasticity rule
   	RANGE A_LTD_pre, A_LTP_pre, A_LTD_post, A_LTP_post
   	RANGE tau_G_a, tau_G_b, m_G
   	RANGE w_pre, w_post, w_pre_init, w_post_init, w
   	RANGE s_ampa, s_nmda
-  
+
   	RANGE tau_u_T, theta_u_T, m_T
   	RANGE theta_u_N, tau_Z_a, tau_Z_b, m_Z, tau_N_alpha, tau_N_beta, m_N_alpha, m_N_beta, theta_N_X
   	RANGE theta_u_C, theta_C_minus, theta_C_plus, tau_K_alpha, tau_K_gamma, m_K_alpha, m_K_beta, s_K_beta
 
-  	RANGE LTD_post, LTP_post
+  	RANGE LTD_pre, LTP_pre, LTD_post, LTP_post
   }
-  
+
   UNITS {
   	(nA) = (nanoamp)
   	(mV) = (millivolt)
   	(uS) = (microsiemens)
   }
-  
+
   PARAMETER {
   	: Parameters of the original Exp2Syn
   	tau_a = 0.2 (ms) <1e-9,1e9>			: time constant of EPSP rise // used for AMPAR currents
   	tau_b = 2 (ms) <1e-9,1e9>			: time constant of EPSP decay
   	e = 0 (mV)							: reversal potential
-  
+
   	w_pre_init = 0.5					: pre factor initial value
   	w_post_init = 2.0					: post factor initial value
-  
+
   	s_ampa = 0.5						: contribution of AMPAR currents
   	s_nmda = 0.5						: contribution of NMDAR currents
-  
+
   	: Parameters of the plasticity rule
   	tau_G_a = 2 (ms) <1e-9,1e9>			: time constant of presynaptic event G (rise) // also used for NMDAR currents
   	tau_G_b = 50 (ms) <1e-9,1e9>		: time constant of presynaptic event G (decay)
   	m_G = 10							: slope of the saturation function for G
-  
+
   	A_LTD_pre = 8.5e-7					: amplitude of pre-LTD
   	A_LTP_pre = 8.5e-7					: amplitude of pre-LTP
   	A_LTD_post = 3.6e-7					: amplitude of post-LTD
   	A_LTP_post = 5.5e-5					: amplitude of post-LTP
-  
+
   	tau_u_T = 10 (ms) <1e-9,1e9>		: time constant for filtering u to calculate T
   	theta_u_T = -60						: voltage threshold applied to u to calculate T
   	m_T = 1.7							: slope of the saturation function for T
-  
+
   	theta_u_N = -30						: voltage threshold applied to u to calculate N
   	tau_Z_a = 1	(ms) <1e-9,1e9>			: time constant of presynaptic event Z (rise)
   	tau_Z_b = 15 (ms) <1e-9,1e9>		: time constant of presynaptic event Z (decay)
@@ -70,7 +75,7 @@ ENDCOMMENT
   	m_N_alpha = 2						: slope of the saturation function for N_alpha
   	m_N_beta = 10						: slope of the saturation function for N_beta
   	theta_N_X = 0.2						: threshold for N to calculate X
-  
+
   	theta_u_C = -68						: voltage threshold applied to u to calculate C
   	theta_C_minus = 15					: threshold applied to C for post-LTD (P activation)
   	theta_C_plus = 35					: threshold applied to C for post-LTP (K-alpha activation)
@@ -80,10 +85,12 @@ ENDCOMMENT
   	m_K_beta = 1.7						: slope of the saturation function for K_beta
   	s_K_beta = 100						: scaling factor for calculation of K_beta
 
+  	LTD_pre = 0
+  	LTP_pre = 0
   	LTD_post = 0
   	LTP_post = 0
   }
-  
+
   ASSIGNED {
   	v (mV)
   	i (nA)
@@ -114,10 +121,12 @@ ENDCOMMENT
   	last_weight
   	ACh
   	Da
-  	tau_ACh
-  	tau_Da
+  	flag_D_ACh
+  	flag_D_Da
+  	last_max_w_ACh
+  	last_max_w_Da
   }
-  
+
   STATE {
   	A (uS)
   	B (uS)
@@ -131,7 +140,7 @@ ENDCOMMENT
   	N_alpha_bar
   	N_beta_bar
   }
-  
+
   INITIAL {
   	LOCAL omega, omega_G, omega_Z
   	g = 0
@@ -147,7 +156,7 @@ ENDCOMMENT
   	w_post = w_post_init
   	w = w_pre * w_post
   	last_weight = 0
-  
+
   	: Calculations taken from the original Exp2Syn
   	: AMPAR-EPSP
   	if (tau_a/tau_b > .9999) {
@@ -158,7 +167,7 @@ ENDCOMMENT
   	omega = (tau_a*tau_b)/(tau_b - tau_a) * log(tau_b/tau_a)
   	epsilon = -exp(-omega/tau_a) + exp(-omega/tau_b)
   	epsilon = 1/epsilon
-  
+
   	: G
   	if (tau_G_a/tau_G_b > .9999) {
   		tau_G_a = .9999*tau_G_b
@@ -168,7 +177,7 @@ ENDCOMMENT
   	omega_G = (tau_G_a*tau_G_b)/(tau_G_b - tau_G_a) * log(tau_G_b/tau_G_a)
   	epsilon_G = -exp(-omega_G/tau_G_a) + exp(-omega_G/tau_G_b)
   	epsilon_G = 1/epsilon_G
-  
+
   	: Z
   	if (tau_Z_a/tau_Z_b > .9999) {
   		tau_Z_a = .9999*tau_Z_b
@@ -179,29 +188,44 @@ ENDCOMMENT
   	epsilon_Z = -exp(-omega_Z/tau_Z_a) + exp(-omega_Z/tau_Z_b)
   	epsilon_Z = 1/epsilon_Z
   }
-  
+
   BREAKPOINT {
   	SOLVE state METHOD cnexp
   	G = sigmoid_sat(m_G, G_b - G_a)			: G presynaptic signal
   	Z = sigmoid_sat(m_Z, Z_b - Z_a)			: Z presynaptic signal
-  
+
   	g_ampa = s_ampa * w_post * (B - A)							: AMPAR conductance
   	g_nmda = s_nmda * w_post_init * (B_n - A_n) * mgblock(v)	: NMDAR conductance
-  
+
   	g = w_pre * (g_ampa + g_nmda)			: average conductance, as w_pre is not actually modeled as a probability
   	i = g * (v - e)
   }
-  
-  DERIVATIVE state {
-  	:LOCAL D, u, Eta, LTD_pre, LTP_pre, LTD_post, LTP_post, g_update, N_alpha, N_beta, N
-  	LOCAL D, u, Eta, LTD_pre, LTP_pre, g_update, N_alpha, N_beta, N
 
-  	if(flag_D == 1) {	: Check if there is a presynaptic event
+  DERIVATIVE state {
+  	LOCAL D, u, Eta, g_update, N_alpha, N_beta, N
+
+  	if(flag_D == 1 || flag_D_ACh == 1 || flag_D_Da == 1) {	: Check if there is a presynaptic event
   		D = 1
   	    flag_D = -1
+  	    flag_D_ACh = -1
+  	    flag_D_Da = -1
   	}
   	else {
   	    D = 0
+  	}
+
+    : Ensures that ACh/Da are between 0 and 1
+    if(ACh > 1.0) {
+  		ACh = 1.0
+  	}
+  	if(ACh < 0.0) {
+  		ACh = 0.0
+  	}
+    if(Da > 1.0) {
+  		Da = 1.0
+  	}
+  	if(Da < 0.0) {
+  		Da = 0.0
   	}
   
   	UNITSOFF
@@ -211,9 +235,8 @@ ENDCOMMENT
   
   	: Calculations for pre-LTD
   	u_bar' = (- u_bar + positive(u - theta_u_T)) / tau_u_T
-  	T = sigmoid_sat(m_T, u_bar)
-  	E = D * T
-  
+  	T = sigmoid_sat(m_T, u_bar)  : between -1 and 1: 2/(1+m_T**-u_bar)-1 [-1 move down to -1; 2: move up to 1]
+
   	: Calculations for pre-LTP
   	N_alpha_bar' = (- N_alpha_bar + positive(u - theta_u_N)) / tau_N_alpha
   	N_beta_bar'	= (- N_beta_bar + N_alpha_bar) / tau_N_beta
@@ -234,29 +257,16 @@ ENDCOMMENT
   	K_gamma' = (- K_gamma + K_beta) / tau_K_gamma
   	K = K_alpha * K_beta * K_gamma
 
-    : ACh/Da
-    if(ACh > 1.0) {
-  		ACh = 1.0
-  	}
-  	if(ACh < 0.0) {
-  		ACh = 0.0
-  	}
-    if(Da > 1.0) {
-  		Da = 1.0
-  	}
-  	if(Da < 0.0) {
-  		Da = 0.0
-  	}
-
   	: Pathway outcomes
-  	LTD_pre = - A_LTD_pre * E
   	LTP_pre	= A_LTP_pre * X * Eta			: apply Eta to make values invariant to changes in dt
+  	LTD_post = - A_LTD_post * P * Eta
 
-  	:LTD_post = -( ((1-ACh) * (1-Da) * A_LTD_post * P * Eta) + (ACh * Eta * (1-Da)) )
-  	:LTP_post =    ((1-ACh) * (1-Da) * A_LTP_post * K * Eta) + (Da * Eta)
+    : ACh acts on LTD_pre; DA blocks LTD_pre
+    : DA acts on LTP_post; ACh has no effect on LTP_post
 
-    LTD_post = -( (A_LTD_post * P * Eta) + (ACh * Eta * (1-Da)) )
-  	LTP_post =    (A_LTP_post * K * Eta) + (Da * Eta)
+    E = D * T
+    LTD_pre  = - A_LTD_pre  * (E + ACh * (last_max_w_Da-Da)/last_max_w_Da * Eta) : Eta only for ACh/Da
+  	LTP_post =   A_LTP_post * (K + Da) * Eta : Eta for all params
 
   	: Update weights
   	w_pre = w_pre + LTD_pre + LTP_pre
@@ -305,9 +315,10 @@ ENDCOMMENT
   		positive = value
   	}
   }
-  
+
+  : between -1 and 1
   FUNCTION sigmoid_sat(slope, value) {	: sigmoidal saturation
-  	sigmoid_sat = 2.0 / (1.0 + pow(slope, -value)) - 1.0
+  	sigmoid_sat = 2.0 / (1.0 + pow(slope, -value)) - 1.0 : [-1 move down to -1; 2: move up to 1]
   }
   
   FUNCTION mgblock(v(mV)) {	: Mg2+ block

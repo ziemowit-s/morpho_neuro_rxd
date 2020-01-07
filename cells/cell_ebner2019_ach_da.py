@@ -22,12 +22,12 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
             # Add ACh syn
             syn_ach = h.SynACh(s(loc))
             self.syns_ach[name] = syn_ach
-            syn_ach.tau = 2000
+            syn_ach.tau = 1000
 
             # Add DA syn
             syn_da = h.SynDa(s(loc))
             self.syns_da[name] = syn_da
-            syn_da.tau = 2000
+            syn_da.tau = 1000
 
             # set pointer
             #
@@ -38,11 +38,14 @@ class CellEbner2019AChDA(CellHay2011, CellPointProcess):
             #
             # Python Example:
             # h.setpointer(sec['hSec'](.5)._ref_ecl, 'e', sec['synMechs'][0]['hSyn'])
-            h.setpointer(syn_ach._ref_g, 'ACh', syn_4p)
-            h.setpointer(syn_da._ref_g, 'Da', syn_4p)
+            h.setpointer(syn_ach._ref_w, 'ACh', syn_4p)
+            h.setpointer(syn_da._ref_w, 'Da', syn_4p)
 
-            h.setpointer(syn_ach._ref_tau, 'tau_ACh', syn_4p)
-            h.setpointer(syn_da._ref_tau, 'tau_Da', syn_4p)
+            h.setpointer(syn_ach._ref_flag_D, 'flag_D_ACh', syn_4p)
+            h.setpointer(syn_da._ref_flag_D, 'flag_D_Da', syn_4p)
+
+            h.setpointer(syn_ach._ref_last_max_w, 'last_max_w_ACh', syn_4p)
+            h.setpointer(syn_da._ref_last_max_w, 'last_max_w_Da', syn_4p)
 
     def _make_4p_syn(self, sec, loc):
         syn_4p = h.Syn4PAChDa(sec(loc))

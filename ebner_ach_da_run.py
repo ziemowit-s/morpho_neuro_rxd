@@ -30,12 +30,11 @@ if __name__ == '__main__':
     cell.add_4p_ach_da_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
-    cell.add_net_stim("syns_4p", weight=WEIGHT, start=WARMUP+1, delay=1, synapses="head[0]")
-    cell.add_net_stim("syns_da", weight=WEIGHT, start=WARMUP+50, delay=1, synapses="head[0]")
-    cell.add_net_stim("syns_ach", weight=WEIGHT, start=WARMUP+100, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_ach", weight=WEIGHT, start=WARMUP+1, delay=1, synapses="head[0]")
+    cell.add_net_stim("syns_da", weight=WEIGHT, start=WARMUP+100, delay=1, synapses="head[0]")
 
     # create plots
-    rec_4psyn = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_post LTP_post w")
+    rec_4psyn = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_pre w")
 
 
     # init and run
