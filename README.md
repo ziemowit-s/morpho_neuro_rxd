@@ -22,7 +22,7 @@ sh compile_mods.sh mods/4p_ach_da_syns/*
 
 # Run
 
-## morpho_diffusion
+### morpho_diffusion
 * Shows how morphological Ca2+ diffusion with RxD and PMCA, NXC pumps works
 * Shows diffusion on neuron model in real time
 * pumps in this example are naively "floating", meaning - they are not attached to the membrane
@@ -33,20 +33,26 @@ python morpho_diffusion_run.py
 * Example of Ca2+ diffusion from the spine head to the dendrite
 ![ca2_diff](img/dendrite_ca2_gif.gif)
 
-## membrane_flux_example
+### membrane_flux_example
 * Shows how membrane pumps works when they are "attached" to the membrane wit RxD
 ```bash
 python membrane_flux_example.py
 ```
 
-## ebner_cell
+### ebner_cell
 * Shows how Ebner2019 cell works
 ```bash
 python ebner_cell_run.py
 ```
 
-## ebner_ach_da
+### ebner_ach_da
 * Shows how Ebner2019 cell works with additional ACh and DA 
 ```bash
 python ebner_ach_da_run.py
+```
+
+### circle_cells_run
+* Shows how set position of each neurons
+```bash
+python circle_cells_run.py
 ```
