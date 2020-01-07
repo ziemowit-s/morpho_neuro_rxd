@@ -45,4 +45,4 @@ class Ebner2019Cell(Hay2011Cell, ConnCell):
         }
 
     def add_4p_synapse(self, sec_names, loc):
-        return self.add_pprocs(name="Syn4PAChDa", sec_names=sec_names, loc=loc, **self.params_4p_syn)
+        return self.add_pprocs(name="Syn4P", sec_names=sec_names, loc=loc, **self.params_4p_syn)

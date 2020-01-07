@@ -32,7 +32,11 @@ class Record:
         for (sec_name, sec), loc in zip(sections.items(), locs):
             for var in variables:
                 s = sec if loc is None else sec(loc)
-                s = getattr(s, "_ref_%s" % var)
+                try:
+                    s = getattr(s, "_ref_%s" % var)
+                except AttributeError:
+                    raise AttributeError("there is no attribute of %s. Maybe you forgot to append locs param for sections?" % var)
+
 
                 rec = h.Vector().record(s)
                 self.recs[var].append(("%s(%s)" % (sec_name, loc), rec))
