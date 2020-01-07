@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from neuron import h
 
 from cells.core.basic_cell import BasicCell
@@ -10,15 +12,15 @@ class PointProcessCell(BasicCell):
             Name of the cell
         """
         BasicCell.__init__(self, name)
-        self.pprocs = {}
-        self.pprocs_num = 0
+        self.point_processes = {}
+        self._pprocs_num = defaultdict(int)
 
-    def filter_pprocs(self, pp_type: str, sec_names, as_list=False):
+    def filter_point_processes(self, pp_type_name: str, sec_names, as_list=False):
         """
         All sec_names must contains index of the point process of the specific type.
         eg. head[0][0] where head[0] is sec_name and [0] is index of the point process of the specific type.
 
-        :param pp_type:
+        :param pp_type_name:
             single string defining name of point process type name, eg. concere synaptic mechanisms like Syn4PAChDa
         :param sec_names:
             List of string names as list or separated by space.
@@ -27,11 +29,11 @@ class PointProcessCell(BasicCell):
         :param as_list:
         :return:
         """
-        return self._filter_obj_dict("pprocs", mech_type=pp_type, names=sec_names, as_list=as_list)
+        return self._filter_obj_dict("point_processes", mech_type=pp_type_name, names=sec_names, as_list=as_list)
 
-    def add_pprocs(self, name, sec_names, loc, **kwargs):
+    def add_point_processes(self, pp_type_name, sec_names, loc, **kwargs):
         """
-        :param name:
+        :param pp_type_name:
         :param sec_names:
             List of string names as list or separated by space.
             Filter will look for obj_dict keys which contains each sec_name.
@@ -42,10 +44,10 @@ class PointProcessCell(BasicCell):
             A list of added Point Processes
         """
         result = []
-        if not hasattr(h, name):
+        if not hasattr(h, pp_type_name):
             raise LookupError("There is no Point Process of name %s. "
-                              "Maybe you forgot to compile or copy mod files?" % name)
-        pp = getattr(h, name)
+                              "Maybe you forgot to compile or copy mod files?" % pp_type_name)
+        pp = getattr(h, pp_type_name)
         sec_names = self._filter_obj_dict("secs", names=sec_names)
 
         for sec_name, sec in sec_names.items():
@@ -55,10 +57,11 @@ class PointProcessCell(BasicCell):
             for key, value in kwargs.items():
                 if not hasattr(pp_instance, key):
                     raise LookupError("Point Process of type %s has no attribute of type %s. "
-                                      "Check if MOD file contains %s as a RANGE variable" % (name, key, key))
+                                      "Check if MOD file contains %s as a RANGE variable" % (pp_type_name, key, key))
                 setattr(pp_instance, key, value)
 
-            self.pprocs["%s_%s[%s]" % (name, sec_name, self.pprocs_num)] = pp_instance
-            self.pprocs_num += 1
+            type_name = "%s_%s" % (pp_type_name, sec_name)
+            self.point_processes["%s[%s]" % (type_name, self._pprocs_num[type_name])] = pp_instance
+            self._pprocs_num[type_name] += 1
 
         return result

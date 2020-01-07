@@ -8,7 +8,7 @@ class NetStimCell(Cell):
         self.netstims = {}
         self.netstim_num = 0
 
-    def filter_net_stims(self, stim_names, as_list=False):
+    def filter_netstims(self, stim_names, as_list=False):
         """
         :param stim_names:
             List of string names as list or separated by space.
@@ -19,7 +19,7 @@ class NetStimCell(Cell):
         """
         return self._filter_obj_dict("netstims", names=stim_names, as_list=as_list)
 
-    def add_stim(self, name, start, number=1, interval=1, noise=0):
+    def add_netstim(self, name, start, number=1, interval=1, noise=0):
         """
 
         :param name:

@@ -1,11 +1,11 @@
-from cells.core.conn_cell import ConnCell
+from cells.core.netcon_cell import NetConnCell
 from cells.hay2011_cell import Hay2011Cell
 
 
-class Ebner2019Cell(Hay2011Cell, ConnCell):
+class Ebner2019CellNet(Hay2011Cell, NetConnCell):
     def __init__(self, name):
         Hay2011Cell.__init__(self, name)
-        ConnCell.__init__(self, name)
+        NetConnCell.__init__(self, name)
 
         self.params_4p_syn = {
             "tau_a": 0.2,  # time constant of EPSP rise
@@ -45,4 +45,4 @@ class Ebner2019Cell(Hay2011Cell, ConnCell):
         }
 
     def add_4p_synapse(self, sec_names, loc):
-        return self.add_pprocs(name="Syn4P", sec_names=sec_names, loc=loc, **self.params_4p_syn)
+        return self.add_point_processes(pp_type_name="Syn4P", sec_names=sec_names, loc=loc, **self.params_4p_syn)

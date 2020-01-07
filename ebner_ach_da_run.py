@@ -2,17 +2,17 @@ from neuron import h
 from neuron.units import mV
 import matplotlib.pyplot as plt
 
-from cells.ebner2019_ach_da_cell import Ebner2019AChDACell
-from cells.core.net_stim_cell import NetStimCell
+from cells.ebner2019_ach_da_cell import Ebner2019AChDACellNet
+from cells.core.netstim_cell import NetStimCell
 from cells.core.spine_cell import SpineCell
 from utils.Record import Record
 from utils.utils import run_sim
 
 
-class EbnerRxDCaSpineCell(Ebner2019AChDACell, SpineCell):
+class EbnerRxDCaSpineCell(Ebner2019AChDACellNet, SpineCell):
     def __init__(self, name):
         SpineCell.__init__(self, name)
-        Ebner2019AChDACell.__init__(self, name)
+        Ebner2019AChDACellNet.__init__(self, name)
 
 
 WEIGHT = 0.0035		# µS, conductance of (single) synaptic potentials
@@ -32,15 +32,15 @@ if __name__ == '__main__':
 
     # Create stims
     s1 = NetStimCell("stim_cell")
-    stim1 = s1.add_stim("stim1", start=WARMUP + 1)
-    stim2 = s1.add_stim("stim2", start=WARMUP + 100)
+    stim1 = s1.add_netstim("stim1", start=WARMUP + 1)
+    stim2 = s1.add_netstim("stim2", start=WARMUP + 100)
 
     # stimulation
-    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynACh", sec_names="head[0][10]")
-    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynDa", sec_names="head[0][20]")
+    cell.add_netcons(source=stim1, weight=WEIGHT, delay=1, pp_type_name="SynACh", sec_names="head[0][0]")
+    cell.add_netcons(source=stim1, weight=WEIGHT, delay=1, pp_type_name="SynDa", sec_names="head[0][0]")
 
     # create plots
-    rec_4psyn = Record(cell.filter_pprocs(pp_type="Syn4PAChDa", sec_names="head[0][0]"), variables="LTD_pre w")
+    rec_4psyn = Record(cell.filter_point_processes(pp_type_name="Syn4PAChDa", sec_names="head[0][0]"), variables="LTD_pre w")
 
     # init and run
     h.finitialize(-70 * mV)

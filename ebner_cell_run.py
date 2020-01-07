@@ -2,17 +2,17 @@ from neuron import h
 from neuron.units import mV
 import matplotlib.pyplot as plt
 
-from cells.core.net_stim_cell import NetStimCell
-from cells.ebner2019_cell import Ebner2019Cell
+from cells.core.netstim_cell import NetStimCell
+from cells.ebner2019_cell import Ebner2019CellNet
 from cells.core.spine_cell import SpineCell
 from utils.Record import Record
 from utils.utils import run_sim
 
 
-class EbnerRxDCaSpineCell(Ebner2019Cell, SpineCell):
+class EbnerRxDCaSpineCell(Ebner2019CellNet, SpineCell):
     def __init__(self, name):
         SpineCell.__init__(self, name)
-        Ebner2019Cell.__init__(self, name)
+        Ebner2019CellNet.__init__(self, name)
 
 
 REPS = 3			# Number of postsynaptic spikes
@@ -36,11 +36,11 @@ if __name__ == '__main__':
     cell.add_4p_synapse(sec_names="head", loc=1)  # add synapse at the top of each spine's head
 
     # stimulation
-    stim = NetStimCell("stim_cell").add_stim("stim1", start=WARMUP + 1, number=300, interval=1)
-    cell.add_conn(source=stim, weight=WEIGHT, delay=1)
+    stim = NetStimCell("stim_cell").add_netstim("stim1", start=WARMUP + 1, number=300, interval=1)
+    cell.add_netcons(source=stim, weight=WEIGHT, delay=1)
 
     # create plots
-    rec_w = Record(cell.filter_pprocs(pp_type="Syn4P", sec_names="head[0][0]"), variables="w")
+    rec_w = Record(cell.filter_point_processes(pp_type_name="Syn4P", sec_names="head[0][0]"), variables="w")
     rec_v = Record(cell.filter_secs(sec_names="head[0]"), locs=1.0, variables="v")
 
     # init and run

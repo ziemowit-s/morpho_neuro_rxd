@@ -1,13 +1,13 @@
 from neuron import h
 
-from cells.core.conn_cell import ConnCell
+from cells.core.netcon_cell import NetConnCell
 from cells.hay2011_cell import Hay2011Cell
 
 
-class Ebner2019AChDACell(Hay2011Cell, ConnCell):
+class Ebner2019AChDACellNet(Hay2011Cell, NetConnCell):
     def __init__(self, name):
         Hay2011Cell.__init__(self, name)
-        ConnCell.__init__(self, name)
+        NetConnCell.__init__(self, name)
 
         self.params_ach = {"tau": 1000}
         self.params_da = {"tau": 1000}
@@ -50,9 +50,9 @@ class Ebner2019AChDACell(Hay2011Cell, ConnCell):
         }
 
     def add_4p_ach_da_synapse(self, sec_names, loc):
-        syns_4p = self.add_pprocs(name="Syn4PAChDa", sec_names=sec_names, loc=loc, **self.params_4p_syn)
-        syns_ach = self.add_pprocs(name="SynACh", sec_names=sec_names, loc=loc, **self.params_ach)
-        syns_da = self.add_pprocs(name="SynDa", sec_names=sec_names, loc=loc, **self.params_da)
+        syns_4p = self.add_point_processes(pp_type_name="Syn4PAChDa", sec_names=sec_names, loc=loc, **self.params_4p_syn)
+        syns_ach = self.add_point_processes(pp_type_name="SynACh", sec_names=sec_names, loc=loc, **self.params_ach)
+        syns_da = self.add_point_processes(pp_type_name="SynDa", sec_names=sec_names, loc=loc, **self.params_da)
 
         # Set pointers
         for s4p, ach, da in zip(syns_4p, syns_ach, syns_da):
