@@ -2,16 +2,17 @@ from neuron import h
 from neuron.units import mV
 import matplotlib.pyplot as plt
 
-from cells.cell_ebner2019_ach_da import CellEbner2019AChDA
-from cells.core.cell_spine import CellSpine
+from cells.ebner2019_ach_da_cell import Ebner2019AChDACell
+from cells.core.net_stim_cell import NetStimCell
+from cells.core.spine_cell import SpineCell
 from utils.Record import Record
 from utils.utils import run_sim
 
 
-class CellEbnerRxDCaSpine(CellEbner2019AChDA, CellSpine):
+class EbnerRxDCaSpineCell(Ebner2019AChDACell, SpineCell):
     def __init__(self, name):
-        CellSpine.__init__(self, name)
-        CellEbner2019AChDA.__init__(self, name)
+        SpineCell.__init__(self, name)
+        Ebner2019AChDACell.__init__(self, name)
 
 
 WEIGHT = 0.0035		# µS, conductance of (single) synaptic potentials
@@ -22,20 +23,24 @@ if __name__ == '__main__':
     h.load_file('stdrun.hoc')
 
     # define cell
-    cell = CellEbnerRxDCaSpine(name="cell")
+    cell = EbnerRxDCaSpineCell(name="cell")
     cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
     cell.add_soma_mechanisms()
     cell.add_apical_mechanisms(sections='dend head neck')
-    cell.add_4p_ach_da_synapse(sections="head", loc=1)  # add synapse at the top of each spine's head
+    cell.add_4p_ach_da_synapse(sec_names="head", loc=1)  # add synapse at the top of each spine's head
+
+    # Create stims
+    s1 = NetStimCell("stim_cell")
+    stim1 = s1.add_stim("stim1", start=WARMUP + 1)
+    stim2 = s1.add_stim("stim2", start=WARMUP + 100)
 
     # stimulation
-    cell.add_net_stim("syns_ach", weight=WEIGHT, start=WARMUP+1, delay=1, synapses="head[0]")
-    cell.add_net_stim("syns_da", weight=WEIGHT, start=WARMUP+100, delay=1, synapses="head[0]")
+    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynACh", sec_names="head[0]")
+    cell.add_conn(source=stim1, weight=WEIGHT, delay=1, pp_type="SynDa", sec_names="head[0]")
 
     # create plots
-    rec_4psyn = Record(cell.filter_syns("syns_4p", "head[0]"), variables="LTD_pre w")
-
+    rec_4psyn = Record(cell.filter_pprocs("syns_4p", "head[0]"), variables="LTD_pre w")
 
     # init and run
     h.finitialize(-70 * mV)

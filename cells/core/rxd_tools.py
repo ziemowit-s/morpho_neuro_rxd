@@ -3,15 +3,15 @@ import numpy as np
 from neuron import rxd
 import matplotlib.pyplot as plt
 from neuron.rxd.node import Node3D
-from neuron.units import mM, M, nM, ms, sec, uM
+from neuron.units import nM, ms, sec
 
 
 class RxDTool:
     @abc.abstractmethod
-    def load(self, sections, dx_3d_size, rxds=None):
+    def load(self, secs, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
-        :param sections:
+        :param secs:
         :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
         :param rxds:
@@ -22,16 +22,17 @@ class RxDTool:
 
 class RxDCa(RxDTool):
 
-    def load(self, sections, dx_3d_size, rxds=None):
+    def load(self, secs, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
         :param secs:
+            List of sections (real HOC objects)
         :param dx_3d_size:
             If 3D geometry is True, define the size of the single compartment size.
         :param rxds:
             dictionary which contains previously added RxDTool objects
         """
-        self.cyt = rxd.Region(secs=sections, nrn_region='i', dx=dx_3d_size)
+        self.cyt = rxd.Region(secs=secs, nrn_region='i', dx=dx_3d_size)
 
         # 1/nM = 1 × 1/10^-9M = 10^3/10^3 × 1/10^-9M = 1000/(10^3×10^-9M) = 1000/10^-6M = 1000/uM
 
@@ -41,19 +42,23 @@ class RxDCa(RxDTool):
         # Calbindin buffer
         self.calbindin = rxd.Species(regions=self.cyt, initial=159982 * nM, name='calbindin', charge=0, d=9.3 / sec)
         self.calbindin_ca = rxd.Species(regions=self.cyt, initial=18 * nM, name='calbindin_ca', charge=0, d=9.3 / sec)
-        self.calbindin_ca_reaction = rxd.Reaction(self.ca + self.calbindin, self.calbindin_ca, 0.028e-3 / (nM * ms), 19.6 / (nM * ms))
+        self.calbindin_ca_reaction = rxd.Reaction(self.ca + self.calbindin, self.calbindin_ca, 0.028e-3 / (nM * ms),
+                                                  19.6 / (nM * ms))
 
         # Calmodulin buffer
         self.calmodulin = rxd.Species(regions=self.cyt, initial=12600 * nM, name='calmodulin', charge=0, d=4 / sec)
-        self.calmodulin_ca2 = rxd.Species(regions=self.cyt, initial=200 * nM, name='calmodulin_ca2', charge=0, d=4 / sec)
+        self.calmodulin_ca2 = rxd.Species(regions=self.cyt, initial=200 * nM, name='calmodulin_ca2', charge=0,
+                                          d=4 / sec)
         self.calmodulin_ca4 = rxd.Species(regions=self.cyt, initial=3 * nM, name='calmodulin_ca4', charge=0, d=4 / sec)
-        self.calmodulin_ca2_reaction = rxd.Reaction(2 * self.ca + self.calmodulin, self.calmodulin_ca2, 6e-6 / (nM * ms), 9.1e-3 / (nM * ms))
-        self.calmodulin_ca4_reaction = rxd.Reaction(2 * self.ca + self.calmodulin_ca2, self.calmodulin_ca4, 0.1e-3 / (nM * ms), 1000e-3 / (nM * ms))
+        self.calmodulin_ca2_reaction = rxd.Reaction(2 * self.ca + self.calmodulin, self.calmodulin_ca2,
+                                                    6e-6 / (nM * ms), 9.1e-3 / (nM * ms))
+        self.calmodulin_ca4_reaction = rxd.Reaction(2 * self.ca + self.calmodulin_ca2, self.calmodulin_ca4,
+                                                    0.1e-3 / (nM * ms), 1000e-3 / (nM * ms))
 
 
 class RxDpmca(RxDTool):
 
-    def load(self, sections, dx_3d_size, rxds=None):
+    def load(self, secs, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
         :param secs:
@@ -75,7 +80,7 @@ class RxDpmca(RxDTool):
 
 class RxDncx(RxDTool):
 
-    def load(self, sections, dx_3d_size, rxds=None):
+    def load(self, secs, dx_3d_size, rxds=None):
         """
         Must be called after all secs are set.
         :param secs:
@@ -98,7 +103,7 @@ def plot_contours(species: rxd.Species):
     r = species.nodes[0].region
     if not hasattr(r, '_xs'):
         raise LookupError("For RxD ionic contour plot - you must use 3D RxD model.")
-    xz = np.empty((max(r._xs)+1, max(r._zs)+1))
+    xz = np.empty((max(r._xs) + 1, max(r._zs) + 1))
     xz.fill(np.nan)
 
     def replace_nans(a, b):

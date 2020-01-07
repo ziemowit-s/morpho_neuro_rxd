@@ -1,11 +1,11 @@
 from random import randint
 
-from cells.core.cell import Cell
+from cells.core.basic_cell import BasicCell
 
 
-class CellSpine(Cell):
+class SpineCell(BasicCell):
     def __init__(self, name):
-        Cell.__init__(self, name)
+        BasicCell.__init__(self, name)
         self.heads = []
         self.necks = []
 
@@ -30,14 +30,15 @@ class CellSpine(Cell):
         sections = sections.values()
 
         for i in range(spine_number):
-            head = self.add_cylindric_sec(name="head[%s]" % i, diam=1, l=1, nseg=head_nseg)
-            neck = self.add_cylindric_sec(name="neck[%s]" % i, diam=0.5, l=0.5, nseg=neck_nseg)
+            head = self.add_sec(name="head[%s]" % i, diam=1, l=1, nseg=head_nseg)
+            neck = self.add_sec(name="neck[%s]" % i, diam=0.5, l=0.5, nseg=neck_nseg)
             self.heads.append(head)
             self.necks.append(neck)
-            self.connect(fr='head[%s]' % i, to='neck[%s]' % i)
+            self.connect_secs(source='head[%s]' % i, target='neck[%s]' % i)
             self._connect_necks_rand_uniform(neck, sections)
 
-    def _connect_necks_rand_uniform(self, necks, sections):
+    @staticmethod
+    def _connect_necks_rand_uniform(necks, sections):
         """
         Connect necks list to sections list with uniform random distribution
         :param necks:
@@ -46,12 +47,12 @@ class CellSpine(Cell):
         max_l = int(sum([s.L for s in sections]))
         added = dict([(s.name(), []) for s in sections])
 
-        l = 0
+        i = 0
         r = randint(0, max_l)
         for s in sections:
-            l += s.L
-            if l > r:
-                loc = (r - l + s.L) / s.L
+            i += s.L
+            if i > r:
+                loc = (r - i + s.L) / s.L
                 if loc in added[s.name()]:
                     break
                 necks.connect(s(loc), 0.0)

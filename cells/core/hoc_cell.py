@@ -1,10 +1,10 @@
 from neuron import h
 from nrn import Section
 
-from cells.core.cell import Cell
+from cells.core.basic_cell import BasicCell
 
 
-class CellHOC(Cell):
+class HOCCell(BasicCell):
     def add_hoc(self, hoc_file, seg_per_L_um=1.0, add_const_segs=11):
         """
         :param hoc_file:
@@ -36,4 +36,3 @@ class CellHOC(Cell):
             sec.nseg = add_const_segs + add
 
         self.secs.update(new_secs)
-

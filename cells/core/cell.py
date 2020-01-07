@@ -1,107 +1,55 @@
-from os import path
-
-from neuron import h
-
-h.load_file('stdlib.hoc')
-h.load_file('import3d.hoc')
-
-
 class Cell:
     def __init__(self, name):
         """
         :param name:
             Name of the cell
         """
-        # if Cell (named core_cell) have been built before on the stack of super() objects
-        if not hasattr(self, '_core_cell_builded'):
-            self._name = name
-            self.mechanisms = []
-            self.secs = {}
-            self._core_cell_builded = True
+        self.name = name
 
-    def add_mechanism(self, mechanism=None):
-        """
-        :param mechanism:
-            Single MOD mechanism or a list of MOD mechanisms
-        """
-        if not isinstance(mechanism, list):
-            mechanism = [mechanism]
-        self.mechanisms.extend(mechanism)
-
-    def add_cylindric_sec(self, name, diam=None, l=None, nseg=1, mechanisms='all'):
-        """
-
-        :param name:
-        :param diam:
-        :param l:
-        :param nseg:
-        :param mechanisms:
-            string of mechanisms or list of strings of selected mechanisms.
-        @return:
-        """
-        sec = h.Section(name=name, cell=self)
-        sec.L = l
-        sec.diam = diam
-        sec.nseg = nseg
-        if isinstance(mechanisms, str):
-            mechanisms = [mechanisms]
-
-        for m in self.mechanisms:
-            if 'all' in mechanisms or m in mechanisms:
-                sec.insert(m)
-        self.secs[name] = sec
-        return sec
-
-    def connect(self, fr, to, to_loc=1.0, fr_loc=0.0):
-        """default: fr(0.0) -> to(1.0)"""
-        fr_loc = float(fr_loc)
-        to_loc = float(to_loc)
-        fr = list(self.filter_secs(fr).values())[0]
-        to = list(self.filter_secs(to).values())[0]
-        fr.connect(to(to_loc), fr_loc)
-
-    def filter_secs(self, left, as_list=False):
-        """
-        :param left:
-            list of sections or string defining single section name or sections names separated by space
-        :param as_list:
-            if return as list. Otherwise will return as dict with name as key
-        :return
-            dict[sec_name] = sec
-        """
-        return self._filter_obj_dict("secs", left, as_list)
-
-    def _filter_obj_dict(self, obj_dict_name, left=None, as_list=False):
+    def _filter_obj_dict(self, obj_dict_name, mech_type: str = None, names=None, as_list=False):
         """
         :param obj_dict_name:
-            name of the attribute dict with structure dict[name] = value
-        :param left:
-            list of synapses or string defining single synapse name or synapse names separated by space. If None - all will be left
+            Name of the attribute dict with structure dict[name] = value
+        :param mech_type:
+            Mechanism name. Optional if require prefix for name, eg. SynACh_head[0] -> SynACh is mech_name here.
+            Can be single string without spaces.
+        :param names:
+            List of string names as list or separated by space.
+            Filter will look for obj_dict keys which contains each sec_name.
+            None or 'all' will return all sections.
         :param as_list:
             if return as list. Otherwise will return as dict with name as key
         :return
             dict[sec_name] = sec
         """
-        if isinstance(left, str):
-            left = left.split(' ')
+        if names == 'all':
+            names = None
+
+        if isinstance(names, str):
+            names = names.split(' ')
 
         if not hasattr(self, obj_dict_name):
-            raise ProcessLookupError("Object of class %s has no dict attribute of %s." % (self.__class__.__name__, obj_dict_name))
+            raise ProcessLookupError(
+                "Object of class %s has no dict attribute of %s." % (self.__class__.__name__, obj_dict_name))
 
         obj_dict = getattr(self, obj_dict_name)
         if not isinstance(obj_dict, dict):
-            raise AttributeError("Object of class %s has attribute %s, but it is not a dictionary." % (self.__class__.__name__, obj_dict_name))
+            raise AttributeError("Object of class %s has attribute %s, but it is not a dictionary." % (
+            self.__class__.__name__, obj_dict_name))
+
+        if mech_type:
+            names = ["%s_%s" % (mech_type, n) for n in names]
 
         result = [] if as_list else {}
         for k, v in obj_dict.items():
-            if left is None:
+            if names is None:
                 if as_list:
                     result.append(v)
                 else:
                     result[k] = v
                 continue
 
-            for s in left:
+            for s in names:
                 # section names (especially created by NEURON or hoc) frequently have array-like string name
                 # eg. soma[0]. User can specify exact name eg. dend[12]
                 # or group of names eg. dend (if apply to array-like naming convention)
@@ -118,81 +66,16 @@ class Cell:
                     break
 
         if len(result) == 0:
-            if left:
-                raise LookupError("Cannot find sections of type %s and named %s" % (obj_dict_name, left))
+            if names:
+                raise LookupError("Cannot find sections of type %s and named %s" % (obj_dict_name, names))
             else:
                 raise LookupError("Cannot find any sections of type %s." % obj_dict_name)
 
         return result
-
-    def load_morpho(self, filepath, seg_per_L_um=1.0, add_const_segs=11):
-        """
-        :param filepath:
-            swc file path
-        :param seg_per_L_um:
-            how many segments per single um of L, Length.  Can be < 1. None is 0.
-        :param add_const_segs:
-            how many segments have each section by default.
-            With each um of L this number will be increased by seg_per_L_um
-        """
-        if not path.exists(filepath):
-            raise FileNotFoundError()
-
-        # SWC
-        fileformat = filepath.split('.')[-1]
-        if fileformat == 'swc':
-            morpho = h.Import3d_SWC_read()
-        # Neurolucida
-        elif fileformat == 'asc':
-            morpho = h.Import3d_Neurolucida3()
-        else:
-            raise Exception('file format `%s` not recognized' % filepath)
-
-        morpho.input(filepath)
-        h.Import3d_GUI(morpho, 0)
-        i3d = h.Import3d_GUI(morpho, 0)
-        i3d.instantiate(self)
-
-        # add all SWC sections to self.secs; self.all is defined by SWC import
-        new_secs = {}
-        for sec in self.all:
-            name = sec.name().split('.')[-1]  # eg. name="dend[19]"
-            new_secs[name] = sec
-
-        # change segment number based on seg_per_L_um and add_const_segs
-        for sec in new_secs.values():
-            add = int(sec.L * seg_per_L_um) if seg_per_L_um is not None else 0
-            sec.nseg = add_const_segs + add
-
-        self.secs.update(new_secs)
-        del self.all
-
-    def set_position(self, x, y, z):
-        h.define_shape()
-        for sec in self.secs.values():
-            for i in range(sec.n3d()):
-                sec.pt3dchange(i,
-                               x - sec.x3d(i),
-                               y - sec.y3d(i),
-                               z - sec.z3d(i),
-                              sec.diam3d(i))
-        
-    def rotate_z(self, theta):
-        h.define_shape()
-        """Rotate the cell about the Z axis."""
-        for sec in self.secs.values():
-            for i in range(sec.n3d()):
-                x = sec.x3d(i)
-                y = sec.y3d(i)
-                c = h.cos(theta)
-                s = h.sin(theta)
-                xprime = x * c - y * s
-                yprime = x * s + y * c
-                sec.pt3dchange(i, xprime, yprime, sec.z3d(i), sec.diam3d(i))
 
     @staticmethod
     def _is_array_name(name):
         return "[" in name
 
     def __repr__(self):
-        return "Cell[{}]".format(self._name)
+        return "Cell[{}]".format(self.name)

@@ -1,17 +1,17 @@
-from cells.core.cell import Cell
+from cells.core.basic_cell import BasicCell
 
 
-class CellHay2011(Cell):
+class Hay2011Cell(BasicCell):
     def __init__(self, name):
-        Cell.__init__(self, name)
+        BasicCell.__init__(self, name)
 
     def add_soma_mechanisms(self, sections='soma'):
         """
         :param sections:
-            list of sections or string defining single section name or sections names separated by space
-            param 'all' - takes all sections
+            List of sections or string defining single section name or sections names separated by space
+            None will take all sections
         """
-        secs = self.filter_secs(left=sections).values()
+        secs = self.filter_secs(sec_names=sections).values()
         self._set_pas(secs)
         for s in secs:
             s.insert("Im")
@@ -36,13 +36,13 @@ class CellHay2011(Cell):
             s.gSKv3_1bar_SKv3_1 = 0.338029
             s.gNaTs2_tbar_NaTs2_t = 0.998912
 
-    def add_axonal_mechanisms(self, sections='axon'):
+    def add_axonal_mechanisms(self, sec_names='axon'):
         """
-        :param sections:
-            list of sections or string defining single section name or sections names separated by space
-            param 'all' - takes all sections
+        :param sec_names:
+            List of sections or string defining single section name or sections names separated by space
+            None will take all sections
         """
-        secs = self.filter_secs(left=sections).values()
+        secs = self.filter_secs(sec_names=sec_names).values()
         self._set_pas(secs)
         for s in secs:
             s.insert("Im")
@@ -76,10 +76,10 @@ class CellHay2011(Cell):
     def add_apical_mechanisms(self, sections='apic'):
         """
         :param sections:
-            list of sections or string defining single section name or sections names separated by space
-            param 'all' - takes all sections
+            List of sections or string defining single section name or sections names separated by space
+            None will take all sections
         """
-        secs = self.filter_secs(left=sections).values()
+        secs = self.filter_secs(sec_names=sections).values()
         self._set_pas(secs)
         for s in secs:
             s.insert("CaDynamics_E2")
@@ -105,16 +105,16 @@ class CellHay2011(Cell):
     def add_basal_mechanisms(self, sections='basal'):
         """
         :param sections:
-            list of sections or string defining single section name or sections names separated by space
-            param 'all' - takes all sections
+            List of sections or string defining single section name or sections names separated by space
+            None will take all sections
         """
-        secs = self.filter_secs(left=sections).values()
+        secs = self.filter_secs(sec_names=sections).values()
         self._set_pas(secs)
         for s in secs:
-                s.insert("Ih")
-                s.gIhbar_Ih = 0.0001
-                s.cm = 2
-                s.g_pas = 6e-5
+            s.insert("Ih")
+            s.gIhbar_Ih = 0.0001
+            s.cm = 2
+            s.g_pas = 6e-5
 
     @staticmethod
     def _set_pas(secs):

@@ -1,22 +1,19 @@
-import time
-
-import numpy as np
 from neuron import h
-from neuron.units import mV, ms
+from neuron.units import mV
 
-from cells.core.cell_hoc import CellHOC
-from cells.core.cell_rxd import CellRxD
-from cells.core.cell_spine import CellSpine
+from cells.core.hoc_cell import HOCCell
+from cells.core.rxd_cell import RxDCell
+from cells.core.spine_cell import SpineCell
 from cells.core.rxd_tools import RxDCa, RxDpmca, RxDncx
 from utils.Record import Record
 from utils.utils import connect_net_stim, get_shape_plot, run_sim
 
 
-class CellRxDCaSpine(CellRxD, CellSpine, CellHOC):
+class CellRxDCaSpineCellCellCell(RxDCell, SpineCell, HOCCell):
     def __init__(self, name):
-        CellRxD.__init__(self, name)
-        CellSpine.__init__(self, name)
-        CellHOC.__init__(self, name)
+        RxDCell.__init__(self, name)
+        SpineCell.__init__(self, name)
+        HOCCell.__init__(self, name)
 
 """
     if ($1 == 1) {	// AMPA
@@ -104,12 +101,12 @@ if __name__ == '__main__':
     h.dt = .1  # We choose dt = 0.1 here because the ratio of d * dt / dx**2 must be less than 1
 
     # define cell
-    cell = CellRxDCaSpine(name="cell")
+    cell = CellRxDCaSpineCellCellCell(name="cell")
     cell.load_morpho(filepath='morphologies/swc/my.swc', seg_per_L_um=1, add_const_segs=11)
     cell.add_spines(spine_number=10, head_nseg=10, neck_nseg=10, sections='dend')
-    cell.add_rxd(rxd_obj=RxDCa(), sections="soma dend head neck")
-    cell.add_rxd(rxd_obj=RxDpmca(), sections="soma dend head neck")
-    cell.add_rxd(rxd_obj=RxDncx(), sections="head neck")
+    cell.add_rxd(rxd_obj=RxDCa(), sec_names="soma dend head neck")
+    cell.add_rxd(rxd_obj=RxDpmca(), sec_names="soma dend head neck")
+    cell.add_rxd(rxd_obj=RxDncx(), sec_names="head neck")
 
     # plots
     ps_cai = get_shape_plot(variable='cai', min_val=0, max_val=0.01)
